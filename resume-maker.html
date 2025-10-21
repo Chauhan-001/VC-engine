@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free online resume maker. Create professional resumes with multiple templates. No sign up required. Dark mode resume designer.">
+    <meta name="keywords" content="free resume maker, online resume builder, professional resume templates, dark mode resume, no sign up, free online tool, resume designer, CV maker">
+    <meta name="author" content="VC Engine">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Free Online Resume Maker | No Sign Up Required">
+    <meta property="og:description" content="Create professional resumes online for free. Multiple templates, dark mode, no sign up needed. Build your CV instantly.">
+    <meta property="og:image" content="Gemini_Generated_Image_sqvv8lsqvv8lsqvv.png">
+    <meta property="og:url" content="https://vcengine.com/resume-maker.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Online Resume Maker | No Sign Up Required">
+    <meta name="twitter:description" content="Create professional resumes online for free. Multiple templates, dark mode, no sign up needed. Build your CV instantly.">
+    <meta name="twitter:image" content="Gemini_Generated_Image_sqvv8lsqvv8lsqvv.png">
+    <title>Free Online Resume Maker | No Sign Up Required</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Define Dark Mode and Dynamic CSS Variables */
+        :root {
+            --editor-bg: #1f2937; /* Dark Slate Gray (Form background) */
+            --main-bg: #111827; /* Darker background (Body) */
+            --text-light: #f3f4f6; /* Light gray text */
+            --text-dark: #1f2937; /* Dark gray text for resume paper */
+            --accent-default: #2dd4bf; /* Bright Teal */
+            --resume-paper-bg: #ffffff; /* Resume background color */
+            --font-sans: 'Inter', sans-serif;
+            --font-serif: 'Georgia', serif;
+            --font-mono: 'Menlo', monospace;
+            --current-font: var(--font-sans);
+        }
+        body {
+            font-family: var(--current-font);
+            background-color: var(--main-bg);
+            color: var(--text-light);
+        }
+        
+        /* Form Styling */
+        input[type="text"], input[type="email"], input[type="tel"], textarea, input[type="file"], select {
+            border: 1px solid #4b5563;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+            background-color: #374151; /* Slightly lighter than editor bg */
+            color: var(--text-light);
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent-default);
+            box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
+            outline: none;
+        }
+        .section-header-form {
+            color: var(--accent-default);
+            font-size: 1.5rem;
+            font-weight: 800;
+            border-bottom: 2px solid #4b5563;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Resume Preview Styling (Paper Look) */
+        .resume-page {
+            min-height: 1100px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.5s ease;
+            background-color: var(--resume-paper-bg);
+            color: var(--text-dark);
+            font-family: var(--current-font);
+        }
+
+        /* Resume Content Styling */
+        .template-section-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1.5rem 0 1rem 0;
+            padding-bottom: 0.25rem;
+            font-size: 1.35rem;
+            color: var(--accent-default); /* Use custom accent color */
+            border-bottom: 2px solid var(--accent-default);
+        }
+        .text-accent-dynamic { color: var(--accent-default); }
+        .bg-accent-dynamic { background-color: var(--accent-default); }
+        .border-accent-dynamic { border-color: var(--accent-default); }
+
+        /* Template Selector */
+        .template-radio input[type="radio"] { display: none; }
+        .template-radio input[type="radio"]:checked + label {
+            border-color: var(--accent-default);
+            background-color: rgba(45, 212, 191, 0.1);
+            box-shadow: 0 0 0 2px var(--accent-default);
+        }
+
+        /* Checkbox Styling (Custom Look) */
+        .custom-checkbox {
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #4b5563;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            cursor: pointer;
+            position: relative;
+            background-color: #374151;
+            transition: all 0.2s;
+        }
+        .custom-checkbox:checked {
+            background-color: var(--accent-default);
+            border-color: var(--accent-default);
+        }
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        /* Font Styles */
+        .font-serif-class { font-family: var(--font-serif); }
+        .font-mono-class { font-family: var(--font-mono); }
+
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#1f2937',
+                        'editor-bg': '#1f2937',
+                        'main-bg': '#111827',
+                        'accent-dynamic': 'var(--accent-default)',
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8" style="height: 100vh;">
+        <!-- Input Form Section (Left/Top) -->
+        <div id="inputFormContainer" class="lg:col-span-1 bg-editor-bg rounded-xl shadow-2xl p-6 overflow-y-auto" style="max-height: 100vh;">
+            <h1 class="text-3xl font-extrabold text-accent-dynamic mb-4 border-b-4 border-gray-700 pb-3">Dark Mode Resume Designer</h1>
+            
+            <form id="resumeForm">
+
+                <!-- 1. Identity & Contact -->
+                <div class="mb-8">
+                    <h2 class="section-header-form">1. Identity & Contact</h2>
+                    <input type="text" id="name" placeholder="Full Name" required class="w-full mb-3" oninput="generateResume('preview')">
+                    <input type="text" id="title" placeholder="Target Role (e.g., Software Engineer)" required class="w-full mb-3" oninput="generateResume('preview')">
+                    <input type="email" id="email" placeholder="Email (Optional)" class="w-full mb-3" oninput="generateResume('preview')">
+                    <input type="tel" id="phone" placeholder="Phone Number (Optional)" class="w-full mb-3" oninput="generateResume('preview')">
+                    <input type="text" id="location" placeholder="City, State / Country (Optional)" class="w-full mb-3" oninput="generateResume('preview')">
+                    <input type="text" id="linkedin" placeholder="LinkedIn or Portfolio URL (Optional)" class="w-full" oninput="generateResume('preview')">
+                </div>
+                
+                <!-- 2. Profile Photo -->
+                <div class="mb-8">
+                    <h2 class="section-header-form">2. Profile Photo</h2>
+                    <input type="file" id="imageFile" accept="image/*" onchange="handleImageUpload(event)" class="w-full mb-2">
+                    <p class="text-xs text-gray-400 mb-2">Select image from file manager (local storage). Image will be removed on second visit.</p>
+                    <div id="imageStatus" class="text-sm font-medium"></div>
+                    <div id="imagePreviewContainer" class="mt-3"></div>
+                </div>
+
+                <!-- 3. Summary -->
+                <div class="mb-8">
+                    <h2 class="section-header-form">3. Professional Summary</h2>
+                    <textarea id="summary" placeholder="A brief, impactful summary. Excellent for executives and career-changers." rows="4" class="w-full" oninput="generateResume('preview')"></textarea>
+                </div>
+
+                <!-- 4. Experience -->
+                <div class="mb-8">
+                    <h2 class="section-header-form">4. Experience</h2>
+                    <div id="experienceContainer" class="space-y-4"></div>
+                    <button type="button" onclick="addExperience()" class="mt-4 w-full py-2 font-semibold text-gray-900 rounded-lg bg-accent-dynamic hover:bg-teal-500 transition duration-300 shadow-md">
+                        + Add Experience
+                    </button>
+                </div>
+
+                <!-- 5. Education -->
+                <div class="mb-8">
+                    <h2 class="section-header-form">5. Education</h2>
+                    <div id="educationContainer" class="space-y-4"></div>
+                    <button type="button" onclick="addEducation()" class="mt-4 w-full py-2 font-semibold text-gray-900 rounded-lg bg-accent-dynamic hover:bg-teal-500 transition duration-300 shadow-md">
+                        + Add Education
+                    </button>
+                </div>
+                
+                <!-- Undo Button -->
+                <button type="button" id="undoButton" onclick="undoRemoval()" class="hidden w-full py-2 mb-6 font-semibold text-gray-100 rounded-lg bg-gray-600 hover:bg-gray-700 transition duration-300 shadow-md">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M4 13a8 8 0 0014.07 3.73M20 11a8 8 0 00-14.07-3.73"></path></svg>
+                    Undo Last Removal
+                </button>
+
+                <!-- 6. Key Skills and Extras -->
+                <div class="mb-8">
+                    <h2 class="section-header-form">6. Skills & Extras</h2>
+                    <textarea id="skills" placeholder="List skills separated by commas (e.g., Python, AWS, Leadership)" rows="3" class="w-full mb-3" oninput="generateResume('preview')"></textarea>
+                    <textarea id="languages" placeholder="Languages (e.g., English: Native, Spanish: Conversational)" rows="2" class="w-full mb-3" oninput="generateResume('preview')"></textarea>
+                    <textarea id="hobbies" placeholder="Interests (e.g., Chess, Hiking, Volunteer Tutoring)" rows="2" class="w-full" oninput="generateResume('preview')"></textarea>
+                </div>
+                
+                <!-- 7. Structural Configuration (Checkboxes) -->
+                <div class="mb-8">
+                    <h2 class="section-header-form">7. Structural Configuration</h2>
+                    <div class="space-y-3 text-sm">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleImage" checked class="custom-checkbox" onchange="generateResume('preview')">
+                            <span>Show Profile Image</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleLanguages" checked class="custom-checkbox" onchange="generateResume('preview')">
+                            <span>Show Languages Section</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleHobbies" checked class="custom-checkbox" onchange="generateResume('preview')">
+                            <span>Show Interests/Hobbies Section</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="togglePhone" checked class="custom-checkbox" onchange="generateResume('preview')">
+                            <span>Show Phone Number</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleEmail" checked class="custom-checkbox" onchange="generateResume('preview')">
+                            <span>Show Email Address</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 8. Template Selection -->
+                <div class="mb-8">
+                    <h2 class="section-header-form">8. Select Template</h2>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="template-radio">
+                            <input type="radio" id="template1" name="template" value="1" checked onchange="generateResume('preview')">
+                            <label for="template1" class="block p-3 border-2 border-gray-600 rounded-lg text-center cursor-pointer text-xs font-semibold text-gray-200 transition duration-200">
+                                1. Modern Sidebar
+                            </label>
+                        </div>
+                        <div class="template-radio">
+                            <input type="radio" id="template2" name="template" value="2" onchange="generateResume('preview')">
+                            <label for="template2" class="block p-3 border-2 border-gray-600 rounded-lg text-center cursor-pointer text-xs font-semibold text-gray-200 transition duration-200">
+                                2. Minimalist
+                            </label>
+                        </div>
+                        <div class="template-radio">
+                            <input type="radio" id="template3" name="template" value="3" onchange="generateResume('preview')">
+                            <label for="template3" class="block p-3 border-2 border-gray-600 rounded-lg text-center cursor-pointer text-xs font-semibold text-gray-200 transition duration-200">
+                                3. Corporate Header
+                            </label>
+                        </div>
+                        <div class="template-radio">
+                            <input type="radio" id="template4" name="template" value="4" onchange="generateResume('preview')">
+                            <label for="template4" class="block p-3 border-2 border-gray-600 rounded-lg text-center cursor-pointer text-xs font-semibold text-gray-200 transition duration-200">
+                                4. Chronological
+                            </label>
+                        </div>
+                        <div class="template-radio">
+                            <input type="radio" id="template5" name="template" value="5" onchange="generateResume('preview')">
+                            <label for="template5" class="block p-3 border-2 border-gray-600 rounded-lg text-center cursor-pointer text-xs font-semibold text-gray-200 transition duration-200">
+                                5. Technical Icon
+                            </label>
+                        </div>
+                        <div class="template-radio">
+                            <input type="radio" id="template6" name="template" value="6" onchange="generateResume('preview')">
+                            <label for="template6" class="block p-3 border-2 border-gray-600 rounded-lg text-center cursor-pointer text-xs font-semibold text-gray-200 transition duration-200">
+                                6. Executive Focus
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. Advanced Design Options (Color/Font) -->
+                <div class="mb-8">
+                    <h2 class="section-header-form">9. Advanced Design</h2>
+                    <div class="flex items-center mb-4">
+                        <label for="accentColor" class="w-1/3 text-sm">Accent Color:</label>
+                        <input type="color" id="accentColor" value="#2dd4bf" class="w-2/3 h-10 p-1 border-gray-600 rounded-lg cursor-pointer" oninput="updateDesignSettings()">
+                    </div>
+                    <div class="flex items-center mb-4">
+                        <label for="fontSelector" class="w-1/3 text-sm">Font Family:</label>
+                        <select id="fontSelector" class="w-2/3 p-2 rounded-lg" onchange="updateDesignSettings()">
+                            <option value="sans">Sans-serif (Inter)</option>
+                            <option value="serif">Serif (Georgia)</option>
+                            <option value="mono">Monospace (Menlo)</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <!-- Generate Button -->
+                <button type="button" onclick="generateResume('final')" class="w-full py-4 text-xl font-bold text-gray-900 rounded-lg bg-accent-dynamic hover:bg-teal-500 transition duration-300 shadow-xl">
+                    Generate Final Resume Page
+                </button>
+            </form>
+        </div>
+
+        <!-- Resume Output Section (Right) -->
+        <div id="outputContainer" class="lg:col-span-2" style="max-height: 100vh; overflow-y: auto;">
+            <div id="previewPane">
+                <h2 class="text-3xl font-extrabold text-gray-100 mb-4 border-b-4 border-gray-700 pb-3">Resume Preview</h2>
+                <p class="text-gray-400 mb-6">Your resume will be generated below. Customize settings in the left panel.</p>
+                <div id="resumeOutput" class="resume-page bg-white p-8 sm:p-12 rounded-xl">
+                    <p class="text-center text-gray-500 italic pt-20">Your resume will appear here once you fill out the form and select a template.</p>
+                </div>
+            </div>
+
+            <!-- Full Page View (Initially hidden) -->
+            <div id="finalResumePage" class="hidden">
+                <button onclick="hideFinalPage()" class="mb-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-gray-900 bg-accent-dynamic hover:bg-teal-500 transition duration-300">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Back to Editor
+                </button>
+                <div id="finalResumeOutput" class="resume-page bg-white p-8 sm:p-12 rounded-xl">
+                    <!-- Final Resume HTML will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lastRemovedBlock = null; 
+        const root = document.documentElement.style;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add one initial block for each section
+            addExperience();
+            addEducation();
+
+            // Visit tracking: increment visit count
+            let visitCount = parseInt(localStorage.getItem('resumeVisitCount') || '0') + 1;
+            localStorage.setItem('resumeVisitCount', visitCount);
+
+            // If second visit or more, remove stored image
+            if (visitCount > 1) {
+                localStorage.removeItem('resumeProfileImage');
+            }
+
+            // Load existing image from local storage (if any)
+            loadLocalImagePreview();
+
+            // Apply initial design settings
+            updateDesignSettings();
+
+            // Initial preview render
+            generateResume('preview');
+        });
+        
+        // Initialize Lucide icons
+        setTimeout(lucide.createIcons, 500);
+
+
+
+        // --- DESIGN & CONFIGURATION ---
+
+        function updateDesignSettings() {
+            const color = document.getElementById('accentColor').value;
+            const font = document.getElementById('fontSelector').value;
+            
+            root.setProperty('--accent-default', color);
+
+            switch (font) {
+                case 'serif':
+                    root.setProperty('--current-font', 'var(--font-serif)');
+                    break;
+                case 'mono':
+                    root.setProperty('--current-font', 'var(--font-mono)');
+                    break;
+                case 'sans':
+                default:
+                    root.setProperty('--current-font', 'var(--font-sans)');
+                    break;
+            }
+
+            // Re-render the form's dynamic buttons
+            document.querySelectorAll('.bg-accent-dynamic').forEach(el => el.style.backgroundColor = color);
+            document.querySelectorAll('.text-accent-dynamic').forEach(el => el.style.color = color);
+
+            // Re-render the resume preview
+            generateResume('preview');
+        }
+
+
+        // --- UI TOGGLE FUNCTIONS ---
+
+        function showFinalPage() {
+            document.getElementById('inputFormContainer').classList.add('hidden');
+            document.getElementById('previewPane').classList.add('hidden');
+            document.getElementById('outputContainer').classList.remove('lg:col-span-2');
+            document.getElementById('outputContainer').classList.add('lg:col-span-3'); // Takes full width on desktop
+            document.getElementById('finalResumePage').classList.remove('hidden');
+        }
+
+        function hideFinalPage() {
+            document.getElementById('inputFormContainer').classList.remove('hidden');
+            document.getElementById('previewPane').classList.remove('hidden');
+            document.getElementById('outputContainer').classList.remove('lg:col-span-3');
+            document.getElementById('outputContainer').classList.add('lg:col-span-2');
+            document.getElementById('finalResumePage').classList.add('hidden');
+            
+            // Re-render the resume to the preview pane when returning to the editor
+            generateResume('preview');
+        }
+
+        // --- IMAGE HANDLING FUNCTIONS (Using LocalStorage) ---
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            const statusDiv = document.getElementById('imageStatus');
+            
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Data = e.target.result;
+                    try {
+                        localStorage.setItem('resumeProfileImage', base64Data);
+                        statusDiv.textContent = 'Image saved to local storage!';
+                        statusDiv.classList.remove('text-red-500', 'text-gray-500');
+                        statusDiv.classList.add('text-teal-400');
+                        
+                        showImagePreview(base64Data);
+                    } catch (error) {
+                        statusDiv.textContent = 'Error saving image. File might be too large.';
+                        statusDiv.classList.add('text-red-500');
+                        statusDiv.classList.remove('text-teal-400');
+                        console.error("Error saving to localStorage:", error);
+                        localStorage.removeItem('resumeProfileImage'); 
+                    }
+                    generateResume('preview');
+                };
+                reader.readAsDataURL(file);
+            } else if (file) {
+                statusDiv.textContent = 'Please select a valid image file.';
+                statusDiv.classList.add('text-red-500');
+                statusDiv.classList.remove('text-teal-400');
+            }
+        }
+
+        function showImagePreview(base64Data) {
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            previewContainer.innerHTML = `<img src="${base64Data}" alt="Profile Photo Preview" class="w-16 h-16 object-cover rounded-full border-2 border-accent-dynamic shadow-md">`;
+        }
+
+        function loadLocalImagePreview() {
+            const base64Data = localStorage.getItem('resumeProfileImage');
+            const statusDiv = document.getElementById('imageStatus');
+
+            if (base64Data) {
+                statusDiv.textContent = 'Photo found and ready from local storage.';
+                statusDiv.classList.add('text-teal-400');
+                showImagePreview(base64Data);
+            } else {
+                statusDiv.textContent = 'No photo uploaded yet.';
+                statusDiv.classList.add('text-gray-400');
+            }
+        }
+
+        // --- DYNAMIC FIELD FUNCTIONS ---
+
+        function getExperienceHtml(index) {
+            return `
+                <div class="dynamic-block p-4 border border-gray-600 rounded-lg bg-gray-700 shadow-sm" data-index="${index}" data-type="experience" oninput="generateResume('preview')">
+                    <h4 class="font-bold mb-3 text-accent-dynamic">Experience Block #${index + 1}</h4>
+                    <input type="text" id="expTitle${index}" placeholder="Role / Position" class="w-full mb-2 text-sm">
+                    <input type="text" id="expCompany${index}" placeholder="Company / Project Name" class="w-full mb-2 text-sm">
+                    <div class="flex space-x-2 mb-2">
+                        <input type="text" id="expDates${index}" placeholder="Start Date - End Date (e.g., 2020 - Present)" class="w-1/2 text-sm">
+                        <input type="text" id="expLocation${index}" placeholder="City, Country (Optional)" class="w-1/2 text-sm">
+                    </div>
+                    <textarea id="expDescription${index}" placeholder="Key accomplishments (one bullet point per line)." rows="3" class="w-full text-sm"></textarea>
+                    <button type="button" onclick="removeBlock(this)" class="mt-2 text-red-400 text-xs hover:text-red-600 font-medium transition duration-200">Remove Block</button>
+                </div>
+            `;
+        }
+
+        function getEducationHtml(index) {
+            return `
+                <div class="dynamic-block p-4 border border-gray-600 rounded-lg bg-gray-700 shadow-sm" data-index="${index}" data-type="education" oninput="generateResume('preview')">
+                    <h4 class="font-bold mb-3 text-accent-dynamic">Qualification #${index + 1}</h4>
+                    <input type="text" id="eduDegree${index}" placeholder="Degree / Certification Name" class="w-full mb-2 text-sm">
+                    <input type="text" id="eduInstitution${index}" placeholder="University / Institution Name" class="w-full mb-2 text-sm">
+                    <div class="flex space-x-2 mb-2">
+                        <input type="text" id="eduDates${index}" placeholder="Dates Attended (e.g., 2018 - 2022)" class="w-1/2 text-sm">
+                        <input type="text" id="eduLocation${index}" placeholder="City, Country (Optional)" class="w-1/2 text-sm">
+                    </div>
+                    <input type="text" id="eduGrade${index}" placeholder="GPA / Honors / Relevant Coursework (Optional)" class="w-full text-sm">
+                    <button type="button" onclick="removeBlock(this)" class="mt-2 text-red-400 text-xs hover:text-red-600 font-medium transition duration-200">Remove Block</button>
+                </div>
+            `;
+        }
+
+        function addExperience() {
+            const container = document.getElementById('experienceContainer');
+            const index = container.children.length;
+            container.insertAdjacentHTML('beforeend', getExperienceHtml(index));
+            updateDesignSettings(); // To apply dynamic color to the new block
+        }
+
+        function addEducation() {
+            const container = document.getElementById('educationContainer');
+            const index = container.children.length;
+            container.insertAdjacentHTML('beforeend', getEducationHtml(index));
+            updateDesignSettings(); // To apply dynamic color to the new block
+        }
+
+        function removeBlock(button) {
+            const block = button.closest('[data-index]');
+            const containerId = block.closest('div[id]').id;
+            const blockType = block.getAttribute('data-type');
+            
+            lastRemovedBlock = { html: block.outerHTML, containerId: containerId, type: blockType };
+            
+            block.style.opacity = '0';
+            block.style.maxHeight = '0px';
+            block.style.padding = '0';
+            block.style.marginBottom = '0';
+            block.style.overflow = 'hidden';
+            
+            setTimeout(() => {
+                block.remove();
+                
+                const undoBtn = document.getElementById('undoButton');
+                undoBtn.classList.remove('hidden');
+                undoBtn.textContent = `Undo Removal of Last ${blockType === 'experience' ? 'Experience/Project' : 'Qualification'}`;
+                generateResume('preview'); 
+            }, 300); 
+        }
+
+        function undoRemoval() {
+            if (!lastRemovedBlock) return;
+            
+            const container = document.getElementById(lastRemovedBlock.containerId);
+            container.insertAdjacentHTML('beforeend', lastRemovedBlock.html);
+            
+            const reInsertedBlock = container.lastElementChild;
+            
+            reInsertedBlock.style.opacity = '1';
+            reInsertedBlock.style.maxHeight = '500px'; 
+            reInsertedBlock.style.padding = '1rem';
+            reInsertedBlock.style.marginBottom = '1rem';
+            reInsertedBlock.style.overflow = 'visible';
+
+            lastRemovedBlock = null;
+            document.getElementById('undoButton').classList.add('hidden');
+            generateResume('preview'); 
+        }
+
+
+        // --- RESUME GENERATION HELPER FUNCTIONS ---
+
+        function buildContactItems(data, iconColor = 'text-gray-700') {
+            const showPhone = document.getElementById('togglePhone').checked;
+            const showEmail = document.getElementById('toggleEmail').checked;
+
+            return {
+                email: (data.email && showEmail) ? `<div class="flex items-center"><i data-lucide="mail" class="w-4 h-4 mr-2 ${iconColor}"></i>${data.email}</div>` : '',
+                phone: (data.phone && showPhone) ? `<div class="flex items-center"><i data-lucide="phone" class="w-4 h-4 mr-2 ${iconColor}"></i>${data.phone}</div>` : '',
+                location: data.location ? `<div class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2 ${iconColor}"></i>${data.location}</div>` : '',
+                linkedin: data.linkedin ? `<div class="flex items-center"><i data-lucide="link" class="w-4 h-4 mr-2 ${iconColor}"></i><a href="${data.linkedin}" target="_blank" class="text-gray-600 hover:text-accent-dynamic">${data.linkedin.includes('linkedin') ? 'LinkedIn Profile' : 'Portfolio'}</a></div>` : ''
+            };
+        }
+
+        function buildListSection(title, listRaw, isSidebar = false, listStyle = 'list-disc') {
+            if (!listRaw) return '';
+            const items = listRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            if (items.length === 0) return '';
+            
+            const titleClass = isSidebar ? 't15-sidebar-title text-accent-dynamic' : 'template-section-title text-accent-dynamic';
+            const listClass = isSidebar ? 'list-none space-y-1 pl-0' : `${listStyle} list-inside ml-4 mt-2 space-y-1`;
+            const headerStyle = isSidebar ? 'border-b-2 border-accent-dynamic' : 'border-b-2 border-accent-dynamic';
+
+            const listHtml = items.map(item => `<li class="text-sm font-medium text-gray-700">${item}</li>`).join('');
+
+            return `
+                <div class="pt-4 pb-4">
+                    <h3 class="${titleClass} ${headerStyle} mb-2">${title}</h3>
+                    <ul class="${listClass}">
+                        ${listHtml}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        function buildDynamicBlocks(sectionType, templateId) {
+            const containerId = sectionType === 'experience' ? 'experienceContainer' : 'educationContainer';
+            const blocks = Array.from(document.querySelectorAll(`#${containerId} > div`)).map((block, index) => {
+                let title, company, dates, location, descriptionRaw, degree, institution, grade;
+                let isExperience = sectionType === 'experience';
+                
+                // Fetch data from hidden inputs
+                if (isExperience) {
+                    title = document.getElementById(`expTitle${index}`).value.trim();
+                    company = document.getElementById(`expCompany${index}`).value.trim();
+                    dates = document.getElementById(`expDates${index}`).value.trim();
+                    location = document.getElementById(`expLocation${index}`).value.trim();
+                    descriptionRaw = document.getElementById(`expDescription${index}`).value.trim();
+                } else {
+                    degree = document.getElementById(`eduDegree${index}`).value.trim();
+                    institution = document.getElementById(`eduInstitution${index}`).value.trim();
+                    dates = document.getElementById(`eduDates${index}`).value.trim();
+                    location = document.getElementById(`eduLocation${index}`).value.trim();
+                    grade = document.getElementById(`eduGrade${index}`).value.trim();
+                }
+                
+                if (isExperience && (!title || !company)) return ''; 
+                if (!isExperience && (!degree || !institution)) return ''; 
+
+                const bulletPoints = descriptionRaw ? descriptionRaw.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0)
+                    .map(line => `<li class="mb-1">${line}</li>`)
+                    .join('') : '';
+
+                // Custom rendering for Template 4 (Chronological Timeline)
+                if (templateId === 4 && isExperience) {
+                    return `
+                        <div class="relative pl-6 pb-6 dynamic-block-item">
+                            <!-- Timeline Dot -->
+                            <div class="absolute left-0 top-1 w-3 h-3 bg-accent-dynamic rounded-full border-2 border-white shadow-md"></div>
+                            
+                            <div class="flex justify-between items-start mb-1">
+                                <div>
+                                    <h4 class="text-lg font-bold text-gray-900">${title}</h4>
+                                    <p class="text-sm text-gray-800 font-semibold">${company} ${location ? `| ${location}` : ''}</p>
+                                </div>
+                                <span class="text-sm font-bold text-accent-dynamic">${dates}</span>
+                            </div>
+                            ${bulletPoints ? `<ul class="list-disc list-inside ml-4 text-sm text-gray-700 mt-2 space-y-0.5">${bulletPoints}</ul>` : ''}
+                        </div>
+                    `;
+                }
+
+                // Default Block structure (Used by T1, T2, T3, T5, T6)
+                // Experience
+                if (isExperience) {
+                    return `
+                        <div class="mb-5 dynamic-block-item">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="text-base font-bold text-gray-900">${title}</h4>
+                                    <p class="text-sm text-gray-600 font-medium">${company} ${location ? `| ${location}` : ''}</p>
+                                </div>
+                                <span class="text-sm font-semibold text-accent-dynamic">${dates}</span>
+                            </div>
+                            ${bulletPoints ? `<ul class="list-disc list-inside ml-4 text-sm text-gray-700 mt-2 space-y-0.5">${bulletPoints}</ul>` : ''}
+                        </div>
+                    `;
+                } 
+                // Education
+                else {
+                    return `
+                        <div class="mb-4 dynamic-block-item">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="text-base font-bold text-gray-900">${degree}</h4>
+                                    <p class="text-sm text-gray-600">${institution} ${location ? `| ${location}` : ''}</p>
+                                </div>
+                                <span class="text-sm font-semibold text-accent-dynamic">${dates}</span>
+                            </div>
+                            ${grade ? `<p class="text-sm italic text-gray-500 mt-0.5 ml-4">${grade}</p>` : ''}
+                        </div>
+                    `;
+                }
+            }).join('');
+            return blocks;
+        }
+
+        // ====================================================================
+        // --- TEMPLATE GENERATION FUNCTIONS (6 Options) ---
+        // ====================================================================
+
+        // --- Template 1: Modern Sidebar (Two-Column) ---
+        function generateTemplate1(data) {
+            const contactItems = buildContactItems(data);
+            const showImage = document.getElementById('toggleImage').checked;
+            const showLanguages = document.getElementById('toggleLanguages').checked;
+            const showHobbies = document.getElementById('toggleHobbies').checked;
+            
+            const contactHtml = (contactItems.email || contactItems.phone || contactItems.location || contactItems.linkedin) ? `
+                <div class="mt-4 pb-4">
+                    <h3 class="t15-sidebar-title text-accent-dynamic border-b-2 border-accent-dynamic">CONTACT</h3>
+                    <div class="space-y-1.5 text-sm text-gray-700">
+                        ${contactItems.email}${contactItems.phone}${contactItems.location}${contactItems.linkedin}
+                    </div>
+                </div>` : '';
+            
+            const imageHtml = (data.base64Data && showImage) ? `
+                <div class="pt-2 pb-4">
+                    <img src="${data.base64Data}" alt="${data.name}" class="w-24 h-24 object-cover rounded-full mx-auto border-4 border-white shadow-lg">
+                </div>
+            ` : '';
+
+            const skillsHtml = buildListSection('SKILLS', data.skills, true, 'list-none');
+            const languagesHtml = showLanguages ? buildListSection('LANGUAGES', data.languages, true, 'list-none') : '';
+            const hobbiesHtml = showHobbies ? buildListSection('INTERESTS', data.hobbies, true, 'list-none') : '';
+            const experienceBlocks = buildDynamicBlocks('experience', 1);
+            const educationBlocks = buildDynamicBlocks('education', 1);
+
+            return `
+                <div style="background-color: var(--accent-default);" class="p-6 text-center text-white">
+                    <h1 class="text-5xl font-extrabold uppercase leading-none">${data.name}</h1>
+                    <h2 class="text-xl font-light mt-1">${data.title}</h2>
+                </div>
+                
+                <div class="grid grid-cols-12 gap-6">
+                    <div class="col-span-12 md:col-span-4 bg-gray-100 p-4 pt-0">
+                        ${imageHtml}
+                        ${contactHtml}
+                        ${skillsHtml}
+                        ${languagesHtml}
+                        ${hobbiesHtml}
+                    </div>
+
+                    <div class="col-span-12 md:col-span-8 p-4 md:p-6 md:pl-0">
+                        ${data.summary ? `
+                            <div class="mb-6">
+                                <h3 class="template-section-title text-accent-dynamic border-none font-extrabold text-xl">PROFILE SUMMARY</h3>
+                                <p class="text-sm text-gray-700 leading-relaxed">${data.summary}</p>
+                            </div>
+                        ` : ''}
+
+                        ${experienceBlocks.trim().length > 0 ? `
+                            <div class="mb-6">
+                                <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">EXPERIENCE</h3>
+                                ${experienceBlocks}
+                            </div>
+                        ` : ''}
+
+                        ${educationBlocks.trim().length > 0 ? `
+                            <div class="mb-6">
+                                <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">EDUCATION</h3>
+                                ${educationBlocks}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // --- Template 2: Minimalist Single Column ---
+        function generateTemplate2(data) {
+            const showImage = document.getElementById('toggleImage').checked;
+            const showLanguages = document.getElementById('toggleLanguages').checked;
+            const showHobbies = document.getElementById('toggleHobbies').checked;
+
+            const experienceBlocks = buildDynamicBlocks('experience', 2);
+            const educationBlocks = buildDynamicBlocks('education', 2);
+            const skillsHtml = buildListSection('KEY SKILLS', data.skills, false, 'list-disc');
+            const languagesHtml = showLanguages ? buildListSection('LANGUAGES', data.languages, false, 'list-disc') : '';
+            const hobbiesHtml = showHobbies ? buildListSection('INTERESTS', data.hobbies, false, 'list-disc') : '';
+            
+            const contactItems = buildContactItems(data, 'text-gray-700');
+
+            return `
+                <div class="p-8">
+                    <div class="text-center pb-4 border-b border-gray-400 mb-6">
+                        ${(data.base64Data && showImage) ? `<img src="${data.base64Data}" alt="${data.name}" class="w-20 h-20 object-cover rounded-full mx-auto mb-3 border-2 border-accent-dynamic">` : ''}
+                        <h1 class="text-4xl font-extrabold uppercase leading-none text-gray-900">${data.name}</h1>
+                        <h2 class="text-lg font-medium mt-0.5 text-gray-600">${data.title}</h2>
+                    </div>
+                    
+                    <div class="text-xs text-gray-600 flex flex-wrap justify-center space-x-4 mb-8">
+                        ${contactItems.email.replace(/text-gray-700/g, 'text-gray-600')}${contactItems.phone.replace(/text-gray-700/g, 'text-gray-600')}${contactItems.location.replace(/text-gray-700/g, 'text-gray-600')}${contactItems.linkedin.replace(/text-gray-700/g, 'text-gray-600')}
+                    </div>
+
+                    ${data.summary ? `
+                        <div class="mb-8">
+                            <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">PROFILE SUMMARY</h3>
+                            <p class="text-sm text-gray-700 leading-relaxed pt-2">${data.summary}</p>
+                        </div>
+                    ` : ''}
+
+                    ${experienceBlocks.trim().length > 0 ? `
+                        <div class="mb-8">
+                            <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">EXPERIENCE</h3>
+                            ${experienceBlocks}
+                        </div>
+                    ` : ''}
+
+                    ${educationBlocks.trim().length > 0 ? `
+                        <div class="mb-8">
+                            <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">EDUCATION</h3>
+                            ${educationBlocks}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="mb-6">
+                        <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">ADDITIONAL INFORMATION</h3>
+                        <div class="grid md:grid-cols-3 gap-6 pt-2">
+                            ${skillsHtml ? `<div class="md:col-span-1">${skillsHtml.replace(/<h3[^>]*>.*?<\/h3>/g, '<h4 class="text-gray-800 font-bold text-sm mb-2">KEY SKILLS</h4>')}</div>` : ''}
+                            ${languagesHtml ? `<div class="md:col-span-1">${languagesHtml.replace(/<h3[^>]*>.*?<\/h3>/g, '<h4 class="text-gray-800 font-bold text-sm mb-2">LANGUAGES</h4>')}</div>` : ''}
+                            ${hobbiesHtml ? `<div class="md:col-span-1">${hobbiesHtml.replace(/<h3[^>]*>.*?<\/h3>/g, '<h4 class="text-gray-800 font-bold text-sm mb-2">INTERESTS</h4>')}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Template 3: Corporate Header ---
+        function generateTemplate3(data) {
+            const showImage = document.getElementById('toggleImage').checked;
+            const showLanguages = document.getElementById('toggleLanguages').checked;
+            const showHobbies = document.getElementById('toggleHobbies').checked;
+            
+            const contactItems = buildContactItems(data, 'text-white');
+            const experienceBlocks = buildDynamicBlocks('experience', 3);
+            const educationBlocks = buildDynamicBlocks('education', 3);
+            const skillsHtml = buildListSection('KEY SKILLS', data.skills, false, 'list-disc');
+            const languagesHtml = showLanguages ? buildListSection('LANGUAGES', data.languages, false, 'list-disc') : '';
+            const hobbiesHtml = showHobbies ? buildListSection('INTERESTS', data.hobbies, false, 'list-disc') : '';
+            
+            return `
+                <div class="p-8 pt-0">
+                    <!-- Header Block -->
+                    <div class="bg-gray-800 p-6 text-white rounded-t-lg -mx-8 -mt-8">
+                        <div class="flex items-center justify-between mb-4">
+                             <div>
+                                <h1 class="text-4xl font-extrabold uppercase leading-tight">${data.name}</h1>
+                                <h2 class="text-xl font-light mt-1 text-accent-dynamic">${data.title}</h2>
+                            </div>
+                            ${(data.base64Data && showImage) ? `<img src="${data.base64Data}" alt="${data.name}" class="w-16 h-16 object-cover rounded-md border-2 border-accent-dynamic shadow-md">` : ''}
+                        </div>
+                        <div class="flex flex-wrap text-sm space-x-6 text-gray-200">
+                            ${contactItems.email.replace(/text-white/g, 'text-gray-200').replace(/text-gray-600/g, 'text-gray-200')}${contactItems.phone.replace(/text-white/g, 'text-gray-200').replace(/text-gray-600/g, 'text-gray-200')}${contactItems.location.replace(/text-white/g, 'text-gray-200').replace(/text-gray-600/g, 'text-gray-200')}${contactItems.linkedin.replace(/text-gray-600/g, 'text-gray-200')}
+                        </div>
+                    </div>
+
+                    <!-- Main Content Area -->
+                    <div class="pt-8">
+                        ${data.summary ? `
+                            <div class="mb-8 border-b-4 border-gray-200 pb-4">
+                                <h3 class="template-section-title text-accent-dynamic border-none text-xl">PROFILE SUMMARY</h3>
+                                <p class="text-sm text-gray-700 leading-relaxed pt-2">${data.summary}</p>
+                            </div>
+                        ` : ''}
+
+                        ${experienceBlocks.trim().length > 0 ? `
+                            <div class="mb-8 border-b-4 border-gray-200 pb-4">
+                                <h3 class="template-section-title text-accent-dynamic border-none text-xl">PROFESSIONAL EXPERIENCE</h3>
+                                ${experienceBlocks}
+                            </div>
+                        ` : ''}
+
+                        ${educationBlocks.trim().length > 0 ? `
+                            <div class="mb-8 border-b-4 border-gray-200 pb-4">
+                                <h3 class="template-section-title text-accent-dynamic border-none text-xl">EDUCATION & QUALIFICATIONS</h3>
+                                ${educationBlocks}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="mb-6">
+                            <h3 class="template-section-title text-accent-dynamic border-none text-xl border-b-4 border-gray-200 pb-4">SKILLS & ADDITIONAL INFO</h3>
+                            <div class="grid md:grid-cols-2 gap-8 pt-2">
+                                ${skillsHtml ? `<div class="md:col-span-1">${skillsHtml.replace(/<h3[^>]*>.*?<\/h3>/g, '<h4 class="text-gray-800 font-bold text-base mb-2">KEY SKILLS</h4>')}</div>` : ''}
+                                <div class="md:col-span-1">
+                                    ${languagesHtml ? languagesHtml.replace(/<h3[^>]*>.*?<\/h3>/g, '<h4 class="text-gray-800 font-bold text-base mb-2">LANGUAGES</h4>') : ''}
+                                    ${hobbiesHtml ? hobbiesHtml.replace(/<h3[^>]*>.*?<\/h3>/g, '<h4 class="text-gray-800 font-bold text-base mb-2">INTERESTS</h4>') : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Template 4: Chronological Timeline ---
+        function generateTemplate4(data) {
+            const showLanguages = document.getElementById('toggleLanguages').checked;
+            const showHobbies = document.getElementById('toggleHobbies').checked;
+            
+            const experienceBlocks = buildDynamicBlocks('experience', 4); // Uses custom structure
+            const educationBlocks = buildDynamicBlocks('education', 4);
+            const skillsHtml = buildListSection('KEY SKILLS', data.skills, false, 'list-none');
+            const languagesHtml = showLanguages ? buildListSection('LANGUAGES', data.languages, false, 'list-none') : '';
+            const hobbiesHtml = showHobbies ? buildListSection('INTERESTS', data.hobbies, false, 'list-none') : '';
+            
+            const contactItems = buildContactItems(data, 'text-gray-700');
+
+            return `
+                <div class="p-8">
+                    <!-- Header -->
+                    <div class="text-left pb-4 border-b-4 border-accent-dynamic">
+                        <h1 class="text-5xl font-extrabold uppercase leading-none text-gray-900">${data.name}</h1>
+                        <h2 class="text-xl font-medium mt-1 text-gray-700">${data.title}</h2>
+                        <div class="text-sm text-gray-600 flex flex-wrap space-x-4 mt-3">
+                            ${contactItems.email.replace(/text-gray-700/g, 'text-gray-600')}${contactItems.phone.replace(/text-gray-700/g, 'text-gray-600')}${contactItems.location.replace(/text-gray-700/g, 'text-gray-600')}${contactItems.linkedin.replace(/text-gray-700/g, 'text-gray-600')}
+                        </div>
+                    </div>
+
+                    <!-- Main Content Area (Timeline) -->
+                    <div class="mt-8">
+                        ${data.summary ? `
+                            <div class="mb-8">
+                                <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">PROFILE SUMMARY</h3>
+                                <p class="text-sm text-gray-700 leading-relaxed pt-2">${data.summary}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${experienceBlocks.trim().length > 0 ? `
+                            <div class="mb-8">
+                                <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">EXPERIENCE TIMELINE</h3>
+                                <div class="border-l-4 border-gray-200 mt-6 timeline-container">
+                                    ${experienceBlocks}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${educationBlocks.trim().length > 0 ? `
+                            <div class="mb-8">
+                                <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">EDUCATION</h3>
+                                ${educationBlocks}
+                            </div>
+                        ` : ''}
+
+                        <div class="mb-6">
+                            <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">KEY SKILLS</h3>
+                            <div class="grid md:grid-cols-3 gap-x-8 pt-2">
+                                ${skillsHtml.replace(/<h3[^>]*>.*?<\/h3>/g, '')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Template 5: Technical & Iconographic (Two-Column) ---
+        function generateTemplate5(data) {
+            const showImage = document.getElementById('toggleImage').checked;
+            const showLanguages = document.getElementById('toggleLanguages').checked;
+            const showHobbies = document.getElementById('toggleHobbies').checked;
+            
+            const contactItems = buildContactItems(data, 'text-gray-800');
+            const contactHtml = (contactItems.email || contactItems.phone || contactItems.location || contactItems.linkedin) ? `
+                <div class="mt-4 pb-4">
+                    <h3 class="t15-sidebar-title text-gray-800 border-b-2 border-gray-400">CONTACT INFO</h3>
+                    <div class="space-y-2 text-sm text-gray-700">
+                        ${contactItems.email.replace(/text-gray-800/g, 'text-gray-700')}${contactItems.phone.replace(/text-gray-800/g, 'text-gray-700')}${contactItems.location.replace(/text-gray-800/g, 'text-gray-700')}${contactItems.linkedin}
+                    </div>
+                </div>` : '';
+
+            const skillsItems = data.skills.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            const skillsHtml = skillsItems.length > 0 ? `
+                <div class="pt-4 pb-4">
+                    <h3 class="t15-sidebar-title text-gray-800 border-b-2 border-gray-400">TECHNICAL SKILLS</h3>
+                    <div class="flex flex-wrap gap-2 text-sm">
+                        ${skillsItems.map(skill => `<span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full font-medium">${skill}</span>`).join('')}
+                    </div>
+                </div>
+            ` : '';
+
+            const languagesHtml = showLanguages ? buildListSection('LANGUAGES', data.languages, true, 'list-none') : '';
+            const hobbiesHtml = showHobbies ? buildListSection('INTERESTS', data.hobbies, true, 'list-none') : '';
+            const experienceBlocks = buildDynamicBlocks('experience', 5);
+            const educationBlocks = buildDynamicBlocks('education', 5);
+
+            return `
+                <div class="grid grid-cols-12 gap-8 p-8">
+                    <!-- MAIN CONTENT (8/12 width) -->
+                    <div class="col-span-12 md:col-span-8 border-r border-gray-300 pr-8">
+                        <!-- HEADER -->
+                        <div class="pb-4 mb-6">
+                            <h1 class="text-4xl font-extrabold uppercase leading-none text-gray-900">${data.name}</h1>
+                            <h2 class="text-lg font-medium mt-1 text-accent-dynamic">${data.title}</h2>
+                        </div>
+                        
+                        <!-- PROFESSIONAL SUMMARY -->
+                        ${data.summary ? `
+                            <div class="mb-6">
+                                <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic text-xl">PROFILE</h3>
+                                <p class="text-sm text-gray-700 leading-relaxed pt-2">${data.summary}</p>
+                            </div>
+                        ` : ''}
+
+                        <!-- EXPERIENCE -->
+                        ${experienceBlocks.trim().length > 0 ? `
+                            <div class="mb-6">
+                                <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic text-xl">EXPERIENCE</h3>
+                                ${experienceBlocks}
+                            </div>
+                        ` : ''}
+
+                        <!-- EDUCATION & QUALIFICATIONS -->
+                        ${educationBlocks.trim().length > 0 ? `
+                            <div class="mb-6">
+                                <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic text-xl">EDUCATION</h3>
+                                ${educationBlocks}
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- SIDEBAR (4/12 width) -->
+                    <div class="col-span-12 md:col-span-4 pt-0">
+                        ${(data.base64Data && showImage) ? `
+                            <div class="pb-4 text-center">
+                                <img src="${data.base64Data}" alt="${data.name}" class="w-24 h-24 object-cover rounded-lg mx-auto border-2 border-accent-dynamic shadow-lg">
+                            </div>
+                        ` : ''}
+                        
+                        ${contactHtml}
+                        ${skillsHtml}
+                        ${languagesHtml}
+                        ${hobbiesHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Template 6: Executive Summary Focus (Single Column) ---
+        function generateTemplate6(data) {
+            const showLanguages = document.getElementById('toggleLanguages').checked;
+            const showHobbies = document.getElementById('toggleHobbies').checked;
+            
+            const experienceBlocks = buildDynamicBlocks('experience', 6);
+            const educationBlocks = buildDynamicBlocks('education', 6);
+            const skillsHtml = buildListSection('KEY SKILLS', data.skills, false, 'list-none');
+            const languagesHtml = showLanguages ? buildListSection('LANGUAGES', data.languages, false, 'list-none') : '';
+            const hobbiesHtml = showHobbies ? buildListSection('INTERESTS', data.hobbies, false, 'list-none') : '';
+            
+            const contactItems = buildContactItems(data, 'text-gray-700');
+
+
+            return `
+                <div class="p-8">
+                    <!-- Header -->
+                    <div class="text-center pb-4 mb-6">
+                        <h1 class="text-5xl font-extrabold uppercase leading-none text-gray-900">${data.name}</h1>
+                        <h2 class="text-xl font-medium mt-1 text-accent-dynamic">${data.title}</h2>
+                        <div class="text-sm text-gray-600 flex flex-wrap justify-center space-x-4 mt-3">
+                            ${contactItems.email.replace(/text-gray-700/g, 'text-gray-600')}${contactItems.phone.replace(/text-gray-700/g, 'text-gray-600')}${contactItems.location.replace(/text-gray-700/g, 'text-gray-600')}${contactItems.linkedin.replace(/text-gray-700/g, 'text-gray-600')}
+                        </div>
+                    </div>
+
+                    <!-- Summary Block (The focal point) -->
+                    ${data.summary ? `
+                        <div class="mb-8 p-6 bg-gray-100 rounded-lg shadow-inner border-l-4 border-accent-dynamic">
+                            <h3 class="text-xl font-extrabold text-gray-800 mb-2">EXECUTIVE SUMMARY</h3>
+                            <p class="text-base text-gray-700 leading-relaxed">${data.summary}</p>
+                        </div>
+                    ` : ''}
+
+                    <!-- Experience -->
+                    ${experienceBlocks.trim().length > 0 ? `
+                        <div class="mb-8">
+                            <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">PROFESSIONAL EXPERIENCE</h3>
+                            ${experienceBlocks}
+                        </div>
+                    ` : ''}
+
+                    <!-- Education -->
+                    ${educationBlocks.trim().length > 0 ? `
+                        <div class="mb-8">
+                            <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">EDUCATION</h3>
+                            ${educationBlocks}
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Skills -->
+                    <div class="mb-6">
+                        <h3 class="template-section-title text-accent-dynamic border-b-2 border-accent-dynamic">SKILLS & QUALIFICATIONS</h3>
+                        <div class="grid md:grid-cols-3 gap-6 pt-2">
+                            ${skillsHtml ? `<div class="md:col-span-1">${skillsHtml.replace(/<h3[^>]*>.*?<\/h3>/g, '<h4 class="text-gray-800 font-bold text-sm mb-2">KEY SKILLS</h4>')}</div>` : ''}
+                            ${languagesHtml ? `<div class="md:col-span-1">${languagesHtml.replace(/<h3[^>]*>.*?<\/h3>/g, '<h4 class="text-gray-800 font-bold text-sm mb-2">LANGUAGES</h4>')}</div>` : ''}
+                            ${hobbiesHtml ? `<div class="md:col-span-1">${hobbiesHtml.replace(/<h3[^>]*>.*?<\/h3>/g, '<h4 class="text-gray-800 font-bold text-sm mb-2">INTERESTS</h4>')}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        // --- MAIN GENERATION FUNCTION ---
+        function generateResume(mode = 'final') {
+            const selectedTemplate = document.querySelector('input[name="template"]:checked').value;
+            
+            const data = {
+                name: document.getElementById('name').value.trim(),
+                title: document.getElementById('title').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                location: document.getElementById('location').value.trim(),
+                linkedin: document.getElementById('linkedin').value.trim(),
+                base64Data: localStorage.getItem('resumeProfileImage') || '', 
+                summary: document.getElementById('summary').value.trim(),
+                skills: document.getElementById('skills').value.trim(),
+                languages: document.getElementById('languages').value.trim(),
+                hobbies: document.getElementById('hobbies').value.trim()
+            };
+
+            if (!data.name || !data.title) {
+                const errorMessage = '<p class="text-red-500 text-center pt-20">Please enter your **Full Name** and **Target Role** before generating the resume.</p>';
+                const targetElement = mode === 'final' ? document.getElementById('finalResumeOutput') : document.getElementById('resumeOutput');
+                targetElement.innerHTML = errorMessage;
+                
+                if (mode === 'final') { hideFinalPage(); }
+                return;
+            }
+
+            let resumeHtml = '';
+            
+            switch (selectedTemplate) {
+                case '1': resumeHtml = generateTemplate1(data); break;
+                case '2': resumeHtml = generateTemplate2(data); break;
+                case '3': resumeHtml = generateTemplate3(data); break;
+                case '4': resumeHtml = generateTemplate4(data); break;
+                case '5': resumeHtml = generateTemplate5(data); break;
+                case '6': resumeHtml = generateTemplate6(data); break;
+                default: resumeHtml = generateTemplate1(data);
+            }
+
+
+            // Decide where to render the output based on mode
+            if (mode === 'final') {
+                document.getElementById('finalResumeOutput').innerHTML = resumeHtml;
+                showFinalPage(); 
+            } else {
+                document.getElementById('resumeOutput').innerHTML = resumeHtml;
+            }
+            // Re-render icons after HTML is inserted
+            setTimeout(lucide.createIcons, 0); 
+        }
+
+        // Add initial blocks if they don't exist (handle user clearing fields)
+        if (document.getElementById('experienceContainer').children.length === 0) { addExperience(); }
+        if (document.getElementById('educationContainer').children.length === 0) { addEducation(); }
+    </script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!--- COMPLETED -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free online PDF page deleter tool. Remove unwanted pages from PDF documents instantly. No sign up required. Edit PDFs online for free. Secure client-side processing.">
+    <meta name="keywords" content="free PDF page deleter, online PDF editor, remove PDF pages, delete PDF pages, no sign up, free online tool, PDF editor, edit PDF online, PDF page removal, client-side PDF editing, secure PDF tool">
+    <meta name="author" content="VC Engine">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Free Online PDF Page Deleter | No Sign Up Required">
+    <meta property="og:description" content="Remove unwanted pages from PDF documents for free online. No sign up needed. Edit PDFs instantly with our free tool. Secure client-side processing.">
+    <meta property="og:image" content="Gemini_Generated_Image_sqvv8lsqvv8lsqvv.png">
+    <meta property="og:url" content="https://vcengine.com/pdf-page-deleter.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Online PDF Page Deleter | No Sign Up Required">
+    <meta name="twitter:description" content="Remove unwanted pages from PDF documents for free online. No sign up needed. Edit PDFs instantly with our free tool. Secure client-side processing.">
+    <meta name="twitter:image" content="Gemini_Generated_Image_sqvv8lsqvv8lsqvv.png">
+    <title>Free Online PDF Page Deleter | No Sign Up Required</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- pdf-lib for client-side PDF modification -->
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn-primary {
+            background-color: #0d9488; /* Teal 600 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #0f766e; /* Teal 700 */
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        /* Custom checkbox style */
+        input[type="checkbox"]:checked {
+            background-color: #0d9488;
+            border-color: #0d9488;
+        }
+        .page-item {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .page-item:hover {
+            background-color: #f0fdfa; /* Teal 50 */
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 flex items-center justify-center">
+
+    <div class="max-w-xl w-full space-y-6">
+        <header class="text-center">
+            <h1 class="text-3xl font-bold text-gray-800">PDF Page Deleter</h1>
+            <p class="text-gray-500 mt-1">Upload a PDF, select pages to keep, and download the trimmed file.</p>
+        </header>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h2 class="text-lg font-semibold text-blue-800 mb-2">How to Use PDF Page Deleter</h2>
+            <p class="text-blue-700 mb-2">This free online tool allows you to remove unwanted pages from PDF documents quickly and easily.</p>
+            <ol class="list-decimal list-inside text-blue-700 space-y-1">
+                <li>Upload your PDF file by clicking the "Select PDF File" button.</li>
+                <li>Once loaded, you'll see all pages listed. Uncheck the pages you want to delete.</li>
+                <li>Click "Download New PDF" to get your edited document.</li>
+            </ol>
+            <p class="text-blue-700 mt-2 font-medium">This tool is completely free to use with no sign-up required. All processing happens in your browser for maximum privacy and security.</p>
+        </div>
+
+        <div class="card space-y-6">
+            
+            <!-- File Upload and Progress -->
+            <div id="upload-section">
+                <label for="pdf-upload" class="block text-sm font-medium text-gray-700 mb-2">Select PDF File:</label>
+                <input type="file" id="pdf-upload" accept="application/pdf" class="w-full text-gray-700 p-2 border border-gray-300 rounded-lg">
+                <p id="loading-status" class="mt-3 text-sm text-yellow-600 hidden">
+                    <span class="animate-spin inline-block mr-2">🔄</span> Processing PDF, please wait...
+                </p>
+            </div>
+
+            <!-- Page Selection -->
+            <div id="page-selection-section" class="hidden">
+                <h2 class="text-xl font-semibold text-gray-700 mb-3">Pages in Document (<span id="total-pages-count">0</span> Total)</h2>
+                
+                <p class="text-sm text-gray-500 mb-4">
+                    **Uncheck** the page numbers below if you want to **DELETE** them. Checked pages will be kept.
+                </p>
+
+                <div id="page-list" class="grid grid-cols-4 sm:grid-cols-5 gap-3 max-h-64 overflow-y-auto p-3 border rounded-lg bg-gray-50">
+                    <!-- Page items will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div>
+                <button id="generate-button" onclick="generateModifiedPdf()" disabled class="btn-primary w-full flex items-center justify-center">
+                    Download New PDF (Keep Selected Pages)
+                </button>
+            </div>
+        </div>
+
+        <!-- Custom Modal for Messages -->
+        <div id="custom-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full space-y-4">
+                <p id="modal-message" class="text-lg font-medium text-gray-800 text-center"></p>
+                <div id="modal-actions" class="flex justify-center">
+                    <button id="modal-close" onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">OK</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const { PDFDocument } = window.PDFLib;
+        const pdfUpload = document.getElementById('pdf-upload');
+        const loadingStatus = document.getElementById('loading-status');
+        const pageSelectionSection = document.getElementById('page-selection-section');
+        const pageList = document.getElementById('page-list');
+        const totalPagesCount = document.getElementById('total-pages-count');
+        const generateButton = document.getElementById('generate-button');
+        
+        let originalPdfBytes = null;
+        let totalPages = 0;
+        let fileName = 'modified_document.pdf';
+
+        // --- Custom Modal Functions (Instead of alert/confirm) ---
+        function showModal(message) {
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('custom-modal').classList.add('flex');
+        }
+
+        window.closeModal = function() {
+            document.getElementById('custom-modal').classList.remove('flex');
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        // --- Core PDF Logic ---
+
+        pdfUpload.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                resetAppState();
+                return;
+            }
+
+            fileName = file.name.replace(/\.pdf$/, '') + '_edited.pdf';
+            loadingStatus.classList.remove('hidden');
+            generateButton.disabled = true;
+            pageSelectionSection.classList.add('hidden');
+
+            try {
+                // 1. Read the file into an ArrayBuffer
+                originalPdfBytes = await file.arrayBuffer();
+                
+                // 2. Load the PDF document just to count pages
+                const pdfDoc = await PDFDocument.load(originalPdfBytes);
+                totalPages = pdfDoc.getPageCount();
+                
+                renderPageSelection();
+
+                loadingStatus.classList.add('hidden');
+                pageSelectionSection.classList.remove('hidden');
+                generateButton.disabled = false;
+
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                loadingStatus.classList.add('hidden');
+                resetAppState();
+                showModal('Error loading PDF file. Please ensure it is a valid PDF.');
+            }
+        });
+
+        function renderPageSelection() {
+            pageList.innerHTML = '';
+            totalPagesCount.textContent = totalPages;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const item = document.createElement('div');
+                item.className = 'page-item flex items-center p-2 rounded-lg bg-white border';
+                item.innerHTML = `
+                    <input type="checkbox" id="page-${i}" value="${i}" checked class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500 cursor-pointer">
+                    <label for="page-${i}" class="ml-2 text-sm font-medium text-gray-700 flex-grow cursor-pointer">Page ${i}</label>
+                `;
+                item.querySelector('input').addEventListener('change', updateButtonState);
+                item.addEventListener('click', (e) => {
+                    // Toggle checkbox only if clicking the container, not the checkbox itself
+                    if (e.target.tagName !== 'INPUT') {
+                        const checkbox = item.querySelector('input');
+                        checkbox.checked = !checkbox.checked;
+                        updateButtonState();
+                    }
+                });
+                pageList.appendChild(item);
+            }
+            updateButtonState();
+        }
+
+        function updateButtonState() {
+            const checkboxes = pageList.querySelectorAll('input[type="checkbox"]:checked');
+            generateButton.disabled = checkboxes.length === 0;
+            generateButton.textContent = `Download New PDF (Keeping ${checkboxes.length} Page${checkboxes.length !== 1 ? 's' : ''})`;
+        }
+
+        function resetAppState() {
+            originalPdfBytes = null;
+            totalPages = 0;
+            fileName = 'modified_document.pdf';
+            pageList.innerHTML = '';
+            totalPagesCount.textContent = '0';
+            pageSelectionSection.classList.add('hidden');
+            generateButton.disabled = true;
+            generateButton.textContent = 'Download New PDF (Keep Selected Pages)';
+            pdfUpload.value = ''; // Clear file input
+        }
+
+        window.generateModifiedPdf = async function() {
+            if (!originalPdfBytes) {
+                showModal('Please upload a PDF file first.');
+                return;
+            }
+
+            loadingStatus.classList.remove('hidden');
+            generateButton.disabled = true;
+
+            try {
+                // Get the indices of the pages the user WANTS TO KEEP (checked)
+                const pagesToKeep = Array.from(pageList.querySelectorAll('input[type="checkbox"]:checked'))
+                                         .map(cb => parseInt(cb.value, 10)); // Page numbers 1-indexed
+
+                if (pagesToKeep.length === 0) {
+                    showModal('You must select at least one page to keep.');
+                    loadingStatus.classList.add('hidden');
+                    generateButton.disabled = false;
+                    return;
+                }
+
+                // Create a new PDF document
+                const originalDoc = await PDFDocument.load(originalPdfBytes);
+                const newDoc = await PDFDocument.create();
+
+                // Get the page indices (0-indexed) to copy
+                // pagesToKeep are 1-indexed, so we subtract 1
+                const indicesToCopy = pagesToKeep.map(p => p - 1);
+
+                // Copy the desired pages from the original to the new document
+                const copiedPages = await newDoc.copyPages(originalDoc, indicesToCopy);
+                copiedPages.forEach(page => newDoc.addPage(page));
+
+                // Serialize the new PDF
+                const pdfBytes = await newDoc.save();
+
+                // Trigger download
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showModal(`Successfully created new PDF: ${fileName} with ${pagesToKeep.length} page(s).`);
+
+            } catch (error) {
+                console.error('Error generating modified PDF:', error);
+                showModal('An error occurred during PDF modification. Check the console for details.');
+            } finally {
+                loadingStatus.classList.add('hidden');
+                generateButton.disabled = false;
+            }
+        }
+
+        // Initialize state on load
+        document.addEventListener('DOMContentLoaded', resetAppState);
+    </script>
+</body>
+</html>

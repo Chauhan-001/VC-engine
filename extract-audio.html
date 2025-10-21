@@ -1,0 +1,349 @@
+<!--- COMPLETED -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video to Audio Extractor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e5;
+        }
+        .file-input {
+            border: 2px dashed #a0aec0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .file-input:hover {
+            border-color: #4c51bf;
+        }
+        .file-input input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="container">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6 text-center">Video to Audio Extractor</h1>
+        <p class="text-gray-600 mb-8 text-center">Upload a video file (MP4, WebM, etc.) and generate a separate audio file (WebM/Opus) containing only the sound track.</p>
+
+        <!-- Input Section -->
+        <div id="input-section" class="space-y-6">
+            
+            <!-- Video Input -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">1. Upload Video File (MP4, WebM)</label>
+                <div class="file-input" onclick="document.getElementById('videoFile').click()">
+                    <input type="file" id="videoFile" accept="video/*" onchange="loadVideoPreview()" class="hidden">
+                    <p id="videoFileName" class="text-gray-500">Click to select your video file</p>
+                </div>
+                <!-- Video Preview and Duration Display -->
+                <div id="videoPreviewContainer" class="mt-3 p-3 border border-gray-200 rounded-lg hidden">
+                    <video id="videoPreview" controls class="w-full rounded-md" style="max-height: 300px;"></video>
+                    <p class="text-xs text-gray-500 mt-2">
+                        Duration: <span id="videoDuration" class="font-semibold text-gray-700">--:--</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Removed: Image Input and Duration Input -->
+
+            <!-- Extract Button -->
+            <button id="extractButton" onclick="extractAudio()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-200 shadow-md disabled:bg-indigo-300" disabled>
+                Extract Audio
+            </button>
+        </div>
+
+        <!-- Status and Output Section -->
+        <div id="output-section" class="mt-8">
+            <div id="statusMessage" class="text-center p-3 rounded-lg text-sm transition-all duration-300"></div>
+
+            <div id="audioContainer" class="mt-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-800 mb-3 text-center">Extracted Audio Result</h2>
+                
+                <!-- Audio Player -->
+                <audio id="outputAudio" controls class="w-full h-auto rounded-lg shadow-lg border border-gray-200"></audio>
+                
+                <!-- Download Link -->
+                <div class="text-center mt-4">
+                    <a id="downloadLink" href="#" download="extracted_audio.webm" class="inline-flex items-center justify-center bg-green-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition duration-200 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v10a1 1 0 11-2 0V3a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                        Download Audio (.webm)
+                    </a>
+                </div>
+                <p class="text-center text-gray-500 mt-2 text-sm">Note: Audio is saved in the efficient **WebM/Opus** format.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const videoFile = document.getElementById('videoFile');
+        const extractButton = document.getElementById('extractButton');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        // Video Preview elements
+        const videoPreviewContainer = document.getElementById('videoPreviewContainer');
+        const videoPreview = document.getElementById('videoPreview');
+        const videoDurationSpan = document.getElementById('videoDuration');
+
+        // Audio Output elements
+        const audioContainer = document.getElementById('audioContainer');
+        const outputAudio = document.getElementById('outputAudio');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let maxVideoDuration = 0; // Global variable to store max duration
+
+        // Helper function to update file name display
+        function displayFileName(inputId, nameId) {
+            const input = document.getElementById(inputId);
+            const nameDisplay = document.getElementById(nameId);
+            if (input.files.length > 0) {
+                nameDisplay.textContent = 'Selected: ' + input.files[0].name;
+                nameDisplay.classList.remove('text-gray-500');
+                nameDisplay.classList.add('text-indigo-600', 'font-medium');
+            } else {
+                nameDisplay.textContent = 'Click to select your video file';
+                nameDisplay.classList.add('text-gray-500');
+                nameDisplay.classList.remove('text-indigo-600', 'font-medium');
+            }
+            checkInputs();
+        }
+
+        // Helper function to format seconds into M:SS
+        function formatDuration(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            const formattedSeconds = remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds;
+            return `${minutes}:${formattedSeconds}`;
+        }
+
+        // Check if a file is selected to enable the button
+        function checkInputs() {
+            extractButton.disabled = !(videoFile.files.length > 0 && maxVideoDuration > 0);
+        }
+
+        // Function to handle video file upload, display name, preview, and duration
+        function loadVideoPreview() {
+            // 1. Update file name and check inputs
+            displayFileName('videoFile', 'videoFileName');
+
+            // 2. Reset preview area
+            maxVideoDuration = 0;
+            videoPreviewContainer.classList.add('hidden');
+            videoPreview.src = '';
+            videoDurationSpan.textContent = '--:--';
+            audioContainer.classList.add('hidden'); // Hide old results
+
+            const file = videoFile.files[0];
+
+            if (file) {
+                const videoUrl = URL.createObjectURL(file);
+                videoPreview.src = videoUrl;
+                
+                // 3. Get and display duration once metadata is loaded
+                videoPreview.onloadedmetadata = () => {
+                    const duration = videoPreview.duration;
+                    if (isFinite(duration) && duration > 0) {
+                        maxVideoDuration = duration; // Store max duration globally
+                        videoDurationSpan.textContent = formatDuration(duration);
+                    } else {
+                        videoDurationSpan.textContent = 'N/A';
+                    }
+                    videoPreviewContainer.classList.remove('hidden');
+                    checkInputs();
+                };
+
+                // Handle potential load errors
+                videoPreview.onerror = (e) => {
+                    console.error("Error loading video for preview:", e);
+                    videoDurationSpan.textContent = 'Error loading video.';
+                    videoPreviewContainer.classList.remove('hidden');
+                    URL.revokeObjectURL(videoUrl);
+                    checkInputs();
+                };
+
+                // Remove previous listener to prevent leaks
+                videoPreview.onabort = () => URL.revokeObjectURL(videoUrl);
+
+            } else {
+                // No file selected, keep hidden
+                videoPreviewContainer.classList.add('hidden');
+                checkInputs();
+            }
+        }
+
+
+        // Display a transient status message
+        function setStatus(message, type = 'info') {
+            let bgColor, textColor;
+            switch (type) {
+                case 'success':
+                    bgColor = 'bg-green-100';
+                    textColor = 'text-green-700';
+                    break;
+                case 'error':
+                    bgColor = 'bg-red-100';
+                    textColor = 'text-red-700';
+                    break;
+                case 'loading':
+                    bgColor = 'bg-blue-100';
+                    textColor = 'text-blue-700';
+                    break;
+                default:
+                    bgColor = 'bg-gray-100';
+                    textColor = 'text-gray-700';
+            }
+            statusMessage.className = `text-center p-3 rounded-lg text-sm ${bgColor} ${textColor} transition-all duration-300`;
+            statusMessage.innerHTML = message;
+        }
+
+        async function extractAudio() {
+            if (extractButton.disabled) return;
+
+            setStatus('Extracting audio track... Please wait.', 'loading');
+            extractButton.disabled = true;
+            audioContainer.classList.add('hidden');
+
+            const videoFileObj = videoFile.files[0];
+
+            if (!videoFileObj) {
+                setStatus('Error: Please select a video file.', 'error');
+                extractButton.disabled = false;
+                return;
+            }
+
+            // Ensure duration is known and valid
+            if (maxVideoDuration <= 0) {
+                 setStatus('Error: Could not determine video duration. Please try a different file.', 'error');
+                extractButton.disabled = false;
+                return;
+            }
+
+            try {
+                // 1. Create a video element to get the MediaStream
+                const tempVideo = document.createElement('video');
+                tempVideo.muted = true; // Essential for some capture APIs
+                tempVideo.src = URL.createObjectURL(videoFileObj);
+                
+                await new Promise((resolve, reject) => {
+                    tempVideo.onloadedmetadata = resolve;
+                    tempVideo.onerror = reject;
+                });
+                
+                // 2. Capture the video stream
+                const stream = tempVideo.captureStream();
+                
+                // 3. Find and isolate the audio track
+                const audioTrack = stream.getAudioTracks()[0];
+
+                if (!audioTrack) {
+                    // Clean up URL and element
+                    URL.revokeObjectURL(tempVideo.src);
+                    tempVideo.remove();
+                    setStatus('Error: The selected video does not appear to contain an audio track.', 'error');
+                    extractButton.disabled = false;
+                    return;
+                }
+
+                // 4. Create an audio-only stream
+                const audioOnlyStream = new MediaStream([audioTrack]);
+
+                // 5. Use MediaRecorder to compile the audio stream
+                // We'll use WebM/Opus, which is highly compatible in browsers for audio recording.
+                const mimeType = 'audio/webm; codecs="opus"';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                     setStatus(`Error: Your browser does not support the required audio format (${mimeType}).`, 'error');
+                     audioTrack.stop();
+                     extractButton.disabled = false;
+                     return;
+                }
+                
+                const recorder = new MediaRecorder(audioOnlyStream, { mimeType });
+                const chunks = [];
+
+                recorder.ondataavailable = (e) => chunks.push(e.data);
+
+                recorder.onstop = () => {
+                    // Create the final audio blob
+                    const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+                    const finalAudioUrl = URL.createObjectURL(audioBlob);
+                    
+                    // Display the audio player and download link
+                    outputAudio.src = finalAudioUrl;
+                    downloadLink.href = finalAudioUrl;
+                    
+                    // Update download filename with a more useful name
+                    let videoName = videoFileObj.name.split('.').slice(0, -1).join('.');
+                    downloadLink.setAttribute('download', `${videoName}_extracted.webm`);
+
+                    audioContainer.classList.remove('hidden');
+                    setStatus('Audio successfully extracted! Use the player or download the WebM file.', 'success');
+
+                    // Clean up
+                    audioTrack.stop(); // Stop the track
+                    URL.revokeObjectURL(tempVideo.src);
+                    tempVideo.remove();
+                    extractButton.disabled = false;
+                };
+
+                // Start recording and stop after the video's duration
+                recorder.start();
+                tempVideo.currentTime = 0;
+                // We need to play the video element so the audio track is active in the stream.
+                tempVideo.play(); 
+
+                setTimeout(() => {
+                    tempVideo.pause(); // Stop playing the video
+                    recorder.stop();
+                    // Track will be stopped in recorder.onstop
+                }, maxVideoDuration * 1000);
+
+                // Handle errors during recording
+                recorder.onerror = (e) => {
+                    setStatus(`An error occurred during recording: ${e.error.name}`, 'error');
+                    extractButton.disabled = false;
+                    audioTrack.stop();
+                    URL.revokeObjectURL(tempVideo.src);
+                    tempVideo.remove();
+                };
+
+            } catch (error) {
+                console.error("Audio Extraction Error:", error);
+                setStatus(`An unexpected error occurred during extraction: ${error.message}`, 'error');
+                extractButton.disabled = false;
+            }
+        }
+
+        // Initial setup
+        checkInputs(); // Run once on load
+        setStatus('Ready to extract audio from your video.', 'info');
+
+    </script>
+</body>
+</html>

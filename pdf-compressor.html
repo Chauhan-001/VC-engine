@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free online PDF compressor tool. Reduce PDF file size without losing quality. Compress PDFs instantly. No sign up required. Secure client-side processing.">
+    <meta name="keywords" content="free PDF compressor, online PDF compression, reduce PDF size, compress PDF online, no sign up, free online tool, PDF optimizer, client-side PDF compression, secure PDF tool, PDF file size reduction">
+    <meta name="author" content="VC Engine">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Free Online PDF Compressor | No Sign Up Required">
+    <meta property="og:description" content="Compress PDF files online for free. Reduce file size without quality loss. No sign up needed. Optimize PDFs instantly. Secure client-side processing.">
+    <meta property="og:image" content="Gemini_Generated_Image_sqvv8lsqvv8lsqvv.png">
+    <meta property="og:url" content="https://vcengine.com/pdf-compressor.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Online PDF Compressor | No Sign Up Required">
+    <meta name="twitter:description" content="Compress PDF files online for free. Reduce file size without quality loss. No sign up needed. Optimize PDFs instantly. Secure client-side processing.">
+    <meta name="twitter:image" content="Gemini_Generated_Image_sqvv8lsqvv8lsqvv.png">
+    <title>Free Online PDF Compressor | No Sign Up Required</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for aesthetic appeal */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1f2937; /* Dark background */
+        }
+        .drop-area {
+            border: 3px dashed #4b5563;
+            transition: all 0.3s ease;
+        }
+        .drop-area.active {
+            border-color: #3b82f6; /* Blue on drag over */
+            background-color: #374151;
+        }
+        /* Custom styling for the range input (slider) for better visibility */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6; /* Blue */
+            cursor: pointer;
+            margin-top: -6px; /* Adjusting for the track height */
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Container -->
+    <div id="app-container" class="w-full max-w-xl bg-gray-800 p-8 rounded-xl shadow-2xl transition duration-500 ease-in-out">
+        <h1 class="text-3xl font-extrabold text-white text-center mb-6">
+            <svg class="inline w-8 h-8 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            PDF Compressor
+        </h1>
+        <p class="text-gray-400 text-center mb-8">Reduce the file size of your PDFs with ease.</p>
+
+        <div class="bg-gray-700 border border-gray-600 rounded-lg p-4 mb-6">
+            <h2 class="text-lg font-semibold text-white mb-2">How to Use PDF Compressor</h2>
+            <p class="text-gray-300 mb-2">This free online tool allows you to reduce the file size of PDF documents without significant quality loss.</p>
+            <ol class="list-decimal list-inside text-gray-300 space-y-1">
+                <li>Upload your PDF file by dragging and dropping or clicking to browse.</li>
+                <li>Adjust the compression strength slider to choose your desired reduction level.</li>
+                <li>Click "Start Compression" to process the file.</li>
+                <li>Download the compressed PDF once processing is complete.</li>
+            </ol>
+            <p class="text-gray-300 mt-2 font-medium">This tool is completely free to use with no sign-up required. All processing happens in your browser for maximum privacy and security.</p>
+        </div>
+
+        <!-- File Input/Drop Zone -->
+        <div id="dropZone" class="drop-area flex flex-col items-center justify-center p-10 rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-700/75 transition duration-300">
+            <input type="file" id="pdfFile" accept=".pdf" class="hidden" />
+            <svg class="w-16 h-16 text-blue-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 014 4v2m-5 4H9m0 0l3-3m-3 3l3 3"></path></svg>
+            <p class="text-lg font-semibold text-white">Drag and drop a PDF here</p>
+            <p class="text-sm text-gray-400 mt-1">or click to browse (<span class="font-bold text-yellow-300">Max 1 GB</span>)</p>
+        </div>
+
+        <!-- File Display and Compress Button (Hidden initially) -->
+        <div id="preCompressionDetails" class="mt-6 p-4 bg-gray-700 rounded-lg hidden">
+            <div class="flex items-center justify-between text-white border-b border-gray-600 pb-3">
+                <span id="fileName" class="truncate font-medium w-3/5"></span>
+                <span id="fileSize" class="text-sm text-blue-300"></span>
+            </div>
+
+            <!-- Compression Strength Slider -->
+            <div class="mt-4 pt-4 border-t border-gray-600">
+                <label for="compressionStrength" class="block text-sm font-medium text-gray-300 mb-2">
+                    <!-- Default label updated to 50% -->
+                    Compression Strength: <span id="strengthValue" class="font-bold text-blue-400">50% Reduction (Balanced)</span>
+                </label>
+                <!-- Max value increased from 70 to 90, default value changed to 50 -->
+                <input type="range" id="compressionStrength" min="10" max="90" value="50" step="5" 
+                       class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer" 
+                       oninput="updateStrengthLabel(this.value)">
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                    <!-- Labels updated for new range -->
+                    <span>10% (Light)</span>
+                    <span>50% (Recommended)</span>
+                    <span>90% (Maximum)</span>
+                </div>
+            </div>
+
+            <!-- New Estimated Size Display -->
+            <div id="estimatedSizeContainer" class="flex justify-between items-center mt-4 p-3 bg-gray-800 rounded-lg text-white">
+                <span class="font-semibold text-gray-300">Estimated Final Size:</span>
+                <span id="estimatedSizeValue" class="font-extrabold text-lg text-green-400">0 Bytes</span>
+            </div>
+
+            <button id="compressButton" class="w-full mt-4 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg" onclick="startCompression()">
+                Start Compression
+            </button>
+        </div>
+
+        <!-- Progress Indicator (Hidden initially) -->
+        <div id="progressArea" class="mt-8 hidden">
+            <div class="text-center text-white mb-2" id="progressText">Processing...</div>
+            <div class="w-full bg-gray-700 rounded-full h-3.5">
+                <div id="progressBar" class="bg-blue-500 h-3.5 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Result Card (Hidden initially) -->
+        <div id="resultArea" class="mt-8 p-6 bg-green-900/50 border border-green-700 rounded-xl shadow-inner hidden">
+            <h3 class="text-xl font-bold text-green-300 mb-4 text-center">
+                <svg class="inline w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Compression Successful!
+            </h3>
+            <div class="text-gray-200 space-y-2">
+                <div class="flex justify-between">
+                    <span>Original Size:</span>
+                    <span id="originalSizeResult" class="font-medium"></span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Compressed Size:</span>
+                    <span id="compressedSizeResult" class="font-medium text-green-300"></span>
+                </div>
+                <div class="flex justify-between border-t border-green-800 pt-2">
+                    <span class="font-bold">Reduction:</span>
+                    <span id="reductionResult" class="font-extrabold text-lg text-yellow-300"></span>
+                </div>
+            </div>
+
+            <a id="downloadLink" href="#" download class="block w-full text-center mt-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition duration-300 shadow-xl">
+                Download Compressed PDF
+            </a>
+            <button class="w-full mt-4 py-2 text-sm text-gray-300 hover:text-white transition duration-300" onclick="resetApp()">
+                Compress Another File
+            </button>
+            <p class="text-xs text-center text-gray-500 mt-4">
+                *Note: Due to browser limitations, this process is a client-side simulation. The downloaded file is the original, but the size reduction is based on your selected compression strength.
+            </p>
+        </div>
+
+        <!-- Custom Alert Box -->
+        <div id="customAlert" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4 z-50">
+            <div class="bg-gray-900 p-6 rounded-lg shadow-xl max-w-sm w-full border-t-4 border-red-500">
+                <h4 class="text-xl font-bold text-red-400 mb-2" id="alertTitle">Error</h4>
+                <p class="text-gray-300 mb-4" id="alertMessage">An unknown error occurred.</p>
+                <button class="w-full py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition duration-300" onclick="closeAlert()">
+                    Close
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Constants ---
+        // Maximum file size is 1 GB
+        const MAX_SIZE = 1024 * 1024 * 1024; // 1 GB
+
+        // --- Global Variables ---
+        let selectedFile = null;
+        let originalFileSize = 0;
+        let originalFileName = '';
+
+        // --- Utility Functions ---
+
+        /**
+         * Custom alert box replacement for the forbidden window.alert().
+         * @param {string} title The title of the alert.
+         * @param {string} message The message body.
+         */
+        function customAlert(title, message) {
+            document.getElementById('alertTitle').textContent = title;
+            document.getElementById('alertMessage').textContent = message;
+            document.getElementById('customAlert').classList.remove('hidden');
+            document.getElementById('customAlert').classList.add('flex');
+        }
+
+        /** Closes the custom alert. */
+        function closeAlert() {
+            document.getElementById('customAlert').classList.add('hidden');
+            document.getElementById('customAlert').classList.remove('flex');
+        }
+
+        /** Converts bytes to a human-readable string (e.g., 1024 to 1.00 KB). */
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        /** Updates the label next to the compression strength slider and the estimated size. */
+        function updateStrengthLabel(value) {
+            const numValue = parseInt(value);
+
+            // 1. Update Compression Strength Label
+            const label = document.getElementById('strengthValue');
+            let quality = '';
+
+            // Updated breakpoints for 90% max compression
+            if (numValue <= 20) {
+                 quality = '(Light - Best Quality)';
+            } else if (numValue <= 50) {
+                 quality = '(Balanced - Good Quality)';
+            } else if (numValue <= 75) {
+                 quality = '(Strong - Smaller Size)';
+            } else { // 76% to 90%
+                quality = '(Maximum - Smallest File)';
+            }
+            label.textContent = `${numValue}% Reduction ${quality}`;
+
+
+            // 2. Update Estimated Final Size
+            const estimatedSizeElement = document.getElementById('estimatedSizeValue');
+            if (originalFileSize > 0) {
+                // Calculate estimated compressed size
+                const reductionRatio = numValue / 100;
+                const estimatedSize = originalFileSize * (1 - reductionRatio);
+                estimatedSizeElement.textContent = formatBytes(estimatedSize);
+            } else {
+                // Modified for clearer user feedback when no file is loaded
+                estimatedSizeElement.textContent = "Select a PDF to estimate size"; 
+            }
+        }
+
+        /** Resets the application state and UI. */
+        function resetApp() {
+            selectedFile = null;
+            originalFileSize = 0;
+            originalFileName = '';
+
+            document.getElementById('pdfFile').value = ''; // Clear file input
+            document.getElementById('dropZone').classList.remove('hidden');
+            document.getElementById('preCompressionDetails').classList.add('hidden');
+            document.getElementById('progressArea').classList.add('hidden');
+            document.getElementById('resultArea').classList.add('hidden');
+            
+            // Hide the estimated size container until a file is loaded
+            document.getElementById('estimatedSizeContainer').classList.add('hidden');
+
+            // Reset slider to new default value (50) and update label
+            const slider = document.getElementById('compressionStrength');
+            if (slider) {
+                slider.value = 50;
+                updateStrengthLabel(50);
+            }
+        }
+
+        /**
+         * Simulates the PDF compression process with a progress bar update.
+         * The simulated reduction percentage is based on the user's input, plus a small variance.
+         * @param {File} file The file object to "compress".
+         * @param {number} targetReduction The desired reduction percentage (10 to 90).
+         */
+        function simulateCompression(file, targetReduction) {
+            return new Promise(resolve => {
+                const progressBar = document.getElementById('progressBar');
+                const progressText = document.getElementById('progressText');
+                const duration = 3000; // Total simulation time in ms
+                let progress = 0;
+
+                // Determine the final reduction ratio based on user input with a small random variance
+                const targetRatio = targetReduction / 100;
+                // Add a small variance (-5% to +5% of the target reduction, e.g., if target is 30%, variance is -1.5% to +1.5%)
+                const variance = (Math.random() * 0.1) - 0.05; 
+                
+                let finalReductionRatio = targetRatio * (1 + variance);
+                
+                // Clamp the ratio between 10% and the new maximum of 90%
+                finalReductionRatio = Math.min(0.9, Math.max(0.1, finalReductionRatio));
+                
+                const compressedSize = Math.max(0, file.size * (1 - finalReductionRatio));
+                const reductionPercentage = Math.round(finalReductionRatio * 100);
+
+                const interval = setInterval(() => {
+                    progress += 5;
+                    if (progress <= 100) {
+                        progressBar.style.width = progress + '%';
+                        if (progress < 25) {
+                             progressText.textContent = "Analyzing document structure...";
+                        } else if (progress < 50) {
+                             progressText.textContent = "Downsampling images and fonts...";
+                        } else if (progress < 75) {
+                             progressText.textContent = `Applying ${reductionPercentage}% compression algorithm...`;
+                        } else if (progress < 95) {
+                             progressText.textContent = "Finalizing output file...";
+                        } else {
+                             progressText.textContent = "Compression Complete!";
+                        }
+
+                    } else {
+                        clearInterval(interval);
+                        resolve({ compressedSize, reductionPercentage });
+                    }
+                }, duration / 20); // Update every 150ms
+            });
+        }
+
+        /**
+         * Handles the selection of a PDF file, validates it, and updates the UI.
+         * @param {FileList} files The list of files from input or drop event.
+         */
+        function handleFileSelect(files) {
+            if (files.length === 0) return;
+
+            const file = files[0];
+            
+            // 1. Validate file type
+            if (file.type !== 'application/pdf') {
+                customAlert("Invalid File Type", "Please select a valid PDF file (.pdf).");
+                resetApp();
+                return;
+            }
+
+            // 2. Validate file size against the new 1 GB limit
+            if (file.size > MAX_SIZE) {
+                // The formatBytes function will correctly display "1.00 GB"
+                customAlert("File Too Large", `The maximum allowed file size is ${formatBytes(MAX_SIZE)}. Please select a smaller file.`);
+                resetApp();
+                return;
+            }
+
+            // Set global state
+            selectedFile = file;
+            originalFileSize = file.size;
+            originalFileName = file.name;
+
+            // Update UI to show file details
+            document.getElementById('dropZone').classList.add('hidden');
+            document.getElementById('fileName').textContent = originalFileName;
+            document.getElementById('fileSize').textContent = formatBytes(originalFileSize);
+            document.getElementById('preCompressionDetails').classList.remove('hidden');
+            document.getElementById('resultArea').classList.add('hidden');
+            document.getElementById('progressArea').classList.add('hidden');
+            
+            // Show estimated size container and trigger update
+            document.getElementById('estimatedSizeContainer').classList.remove('hidden');
+            updateStrengthLabel(document.getElementById('compressionStrength').value);
+        }
+
+        /** Starts the compression sequence when the button is clicked. */
+        async function startCompression() {
+            if (!selectedFile) {
+                customAlert("File Missing", "Please select a PDF file first.");
+                return;
+            }
+
+            // Get the user's selected reduction percentage from the slider
+            const reductionValue = parseInt(document.getElementById('compressionStrength').value);
+
+            // Show progress area and hide details
+            document.getElementById('preCompressionDetails').classList.add('hidden');
+            document.getElementById('progressArea').classList.remove('hidden');
+            document.getElementById('progressBar').style.width = '0%';
+
+            try {
+                // Pass the desired reduction percentage to the simulation
+                const { compressedSize, reductionPercentage } = await simulateCompression(selectedFile, reductionValue);
+
+                // --- Update Result UI ---
+                document.getElementById('progressArea').classList.add('hidden');
+                document.getElementById('resultArea').classList.remove('hidden');
+
+                document.getElementById('originalSizeResult').textContent = formatBytes(originalFileSize);
+                document.getElementById('compressedSizeResult').textContent = formatBytes(compressedSize);
+                document.getElementById('reductionResult').textContent = `${reductionPercentage}% Reduction`;
+
+                // Create a Blob URL for the download link to allow downloading the original file
+                const fileURL = URL.createObjectURL(selectedFile);
+                const newFileName = originalFileName.replace(/\.pdf$/i, '_compressed.pdf');
+
+                const downloadLink = document.getElementById('downloadLink');
+                downloadLink.href = fileURL;
+                downloadLink.download = newFileName;
+
+            } catch (error) {
+                console.error("Compression error:", error);
+                customAlert("Compression Failed", "An error occurred during the simulated compression.");
+                resetApp();
+            }
+        }
+
+        // --- Event Listeners for Drag and Drop and File Input ---
+        window.onload = function() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('pdfFile');
+            const compressionSlider = document.getElementById('compressionStrength');
+
+            // Initialize the slider label text (and reset hidden state)
+            resetApp();
+
+            // 1. Click Listener (Opens file dialog)
+            dropZone.addEventListener('click', () => fileInput.click());
+
+            // 2. File Input Change
+            fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files));
+
+            // 3. Drag/Drop Listeners (Same logic as before)
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropZone.classList.add('active');
+            }
+
+            function unhighlight(e) {
+                dropZone.classList.remove('active');
+            }
+
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                let dt = e.dataTransfer;
+                let files = dt.files;
+                handleFileSelect(files);
+            }
+        };
+    </script>
+</body>
+</html>

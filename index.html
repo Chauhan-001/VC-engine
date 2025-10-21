@@ -1,0 +1,425 @@
+<!--- COMPLETED -->>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VC Engine - Free online video creation and media processing tools. Create videos, merge photos & audio, extract audio, edit PDFs, make resumes, compress images. No sign up required.">
+    <meta name="keywords" content="free video tools, online video creator, merge photos audio, extract audio, PDF editor, resume maker, image compressor, background remover, no sign up, free online tools">
+    <meta name="author" content="VC Engine">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="VC Engine - Free Online Video Creation Tools | No Sign Up">
+    <meta property="og:description" content="Create videos online for free with VC Engine. Merge photos and audio, extract audio, edit PDFs, make resumes, and more. No sign up required.">
+    <meta property="og:image" content="Gemini_Generated_Image_sqvv8lsqvv8lsqvv.png">
+    <meta property="og:url" content="https://vcengine.com">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="VC Engine - Free Online Video Creation Tools | No Sign Up">
+    <meta name="twitter:description" content="Create videos online for free with VC Engine. Merge photos and audio, extract audio, edit PDFs, make resumes, and more. No sign up required.">
+    <meta name="twitter:image" content="Gemini_Generated_Image_sqvv8lsqvv8lsqvv.png">
+    <title>VC Engine - Free Online Video Creation Tools | No Sign Up Required</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 50px 0;
+            color: white;
+        }
+
+        .logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .search-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px 18px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            transform: scale(1.02);
+        }
+
+        .ad-container {
+            margin: 40px 0;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1.5s ease-out;
+        }
+
+        .tool-card:nth-child(2) { animation-delay: 0.2s; }
+        .tool-card:nth-child(3) { animation-delay: 0.4s; }
+        .tool-card:nth-child(4) { animation-delay: 0.6s; }
+        .tool-card:nth-child(5) { animation-delay: 0.8s; }
+        .tool-card:nth-child(6) { animation-delay: 1s; }
+        .tool-card:nth-child(7) { animation-delay: 1.2s; }
+        .tool-card:nth-child(8) { animation-delay: 1.4s; }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .tool-card:hover::before {
+            left: 100%;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+        }
+
+        .tool-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .tool-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .tool-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .tool-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .tool-link:hover {
+            background: transparent;
+            border-color: #667eea;
+            color: #667eea;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            .tools-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .tool-card {
+                padding: 20px;
+            }
+        }
+
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 20%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        .shape:nth-child(4) {
+            width: 70px;
+            height: 70px;
+            bottom: 10%;
+            right: 20%;
+            animation-delay: 1s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <img src="Gemini_Generated_Image_sqvv8lsqvv8lsqvv.png" alt="VC Engine Logo" class="logo" id="logo">
+            <h1>VC Engine</h1>
+            <p class="subtitle">Powerful Video Creation and Media Processing Tools</p>
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search tools...">
+            </div>
+        </header>
+
+        <div class="tools-grid">
+            <div class="tool-card" onclick="window.location.href='merge-photo-audio.html'">
+                <span class="tool-icon">🎬</span>
+                <h3 class="tool-title">Merge Photos & Audio</h3>
+                <p class="tool-description">Combine your photos with audio files to create stunning video slideshows. Perfect for presentations, memories, or creative projects.</p>
+                <a href="merge-photo-audio.html" class="tool-link">Create Video</a>
+            </div>
+
+            <div class="tool-card" onclick="window.location.href='extract-audio.html'">
+                <span class="tool-icon">🎵</span>
+                <h3 class="tool-title">Extract Audio</h3>
+                <p class="tool-description">Extract audio tracks from video files with ease. Convert videos to MP3 or other audio formats for your music library.</p>
+                <a href="extract-audio.html" class="tool-link">Extract Audio</a>
+            </div>
+
+            <div class="tool-card" onclick="window.location.href='pdf-page-deleter.html'">
+                <span class="tool-icon">📄</span>
+                <h3 class="tool-title">PDF Page Deleter</h3>
+                <p class="tool-description">Remove unwanted pages from PDF documents. Clean up your files and keep only what you need.</p>
+                <a href="pdf-page-deleter.html" class="tool-link">Edit PDF</a>
+            </div>
+
+            <div class="tool-card" onclick="window.location.href='resume-maker.html'">
+                <span class="tool-icon">📄</span>
+                <h3 class="tool-title">Resume Maker</h3>
+                <p class="tool-description">Create professional resumes with customizable templates. Perfect for job applications and career advancement.</p>
+                <a href="resume-maker.html" class="tool-link">Create Resume</a>
+            </div>
+
+            <div class="tool-card" onclick="window.location.href='remov-change-bgimage.html'">
+                <span class="tool-icon">🖼️</span>
+                <h3 class="tool-title">Background Remover</h3>
+                <p class="tool-description">Remove or change backgrounds from images effortlessly. Perfect for product photos, portraits, or creative edits.</p>
+                <a href="remov-change-bgimage.html" class="tool-link">Edit Images</a>
+            </div>
+
+            <div class="tool-card" onclick="window.location.href='crop-media-image.html'">
+                <span class="tool-icon">✂️</span>
+                <h3 class="tool-title">Image Cropper</h3>
+                <p class="tool-description">Crop and resize images with precision. Perfect for adjusting dimensions, removing unwanted parts, or preparing images for specific uses.</p>
+                <a href="crop-media-image.html" class="tool-link">Crop Image</a>
+            </div>
+
+            <div class="tool-card" onclick="window.location.href='image-compressor.html'">
+                <span class="tool-icon">🗜️</span>
+                <h3 class="tool-title">Image Compressor</h3>
+                <p class="tool-description">Compress images to reduce file size without losing quality. Optimize your images for web use, faster loading, and storage efficiency.</p>
+                <a href="image-compressor.html" class="tool-link">Compress Image</a>
+            </div>
+
+            <div class="tool-card" onclick="window.location.href='pdf-compressor.html'">
+                <span class="tool-icon">📄</span>
+                <h3 class="tool-title">PDF Compressor</h3>
+                <p class="tool-description">Compress PDF files to reduce file size without losing quality. Optimize your PDFs for sharing and storage.</p>
+                <a href="pdf-compressor.html" class="tool-link">Compress PDF</a>
+            </div>
+
+            <div class="tool-card" onclick="window.location.href='pdf-merger.html'">
+                <span class="tool-icon">📄</span>
+                <h3 class="tool-title">PDF Merger</h3>
+                <p class="tool-description">Merge multiple PDF files into a single document. Combine reports, documents, or pages effortlessly.</p>
+                <a href="pdf-merger.html" class="tool-link">Merge PDFs</a>
+            </div>
+        </div>
+
+        <div class="about-section" style="margin-top: 60px; padding: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; text-align: center; color: white;">
+            <h2 style="font-size: 2rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">About VC Engine</h2>
+            <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;">
+                VC Engine is your go-to platform for free online tools that make video creation, media editing, and document processing simple and accessible. Whether you're merging photos with audio to create stunning videos, extracting sound from clips, editing PDFs, designing professional resumes, or optimizing images, our tools are designed to help you get the job done quickly and easily.
+            </p>
+            <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;">
+                All our tools are completely free to use with no sign-up required. You can start using them right away without creating an account or providing any personal information. We believe in keeping things straightforward and user-friendly.
+            </p>
+            <p style="font-size: 1.1rem; line-height: 1.6;">
+                Your privacy and data security are our top priorities. All processing happens directly in your browser, meaning your files are never uploaded to our servers. We don't store, share, or access your data in any way. Your content remains private and secure on your device at all times.
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // Add smooth scrolling and interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.tool-card');
+
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add loading animation
+            const links = document.querySelectorAll('.tool-link');
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.href) {
+                        e.preventDefault();
+                        this.textContent = 'Loading...';
+                        setTimeout(() => {
+                            window.location.href = this.href;
+                        }, 300);
+                    }
+                });
+            });
+
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                const toolCards = document.querySelectorAll('.tool-card');
+
+                toolCards.forEach(card => {
+                    const title = card.querySelector('.tool-title').textContent.toLowerCase();
+                    const description = card.querySelector('.tool-description').textContent.toLowerCase();
+                    const isVisible = title.includes(query) || description.includes(query);
+                    card.style.display = isVisible ? 'block' : 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

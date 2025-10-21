@@ -1,0 +1,556 @@
+<!--- COMPLETED -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image & Audio Video Creator</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e5;
+        }
+        .file-input {
+            border: 2px dashed #a0aec0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .file-input:hover {
+            border-color: #4c51bf;
+        }
+        .file-input input[type="file"] {
+            display: none;
+        }
+        /* Custom styling for the range slider (for better visibility/scrubbing feel) */
+        #startTimeSlider::-webkit-slider-thumb, #endTimeSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #4c51bf;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="container">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6 text-center">Video from Image & Audio</h1>
+        <p class="text-gray-600 mb-8 text-center">Upload your image and audio, then use the sliders to select the exact **start** and **end** points for your custom video clip.</p>
+
+        <!-- Input Section -->
+        <div id="input-section" class="space-y-6">
+            <!-- Image Input -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">1. Upload Image (JPG, PNG)</label>
+                <div class="file-input" onclick="document.getElementById('imageFile').click()">
+                    <input type="file" id="imageFile" accept="image/*" onchange="displayFileName('imageFile', 'imageFileName')" class="hidden">
+                    <p id="imageFileName" class="text-gray-500">Click to select your image file</p>
+                </div>
+            </div>
+
+            <!-- Audio Input -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">2. Upload Audio (MP3, WAV)</label>
+                <div class="file-input" onclick="document.getElementById('audioFile').click()">
+                    <input type="file" id="audioFile" accept="audio/*" onchange="loadAudioPreview()" class="hidden">
+                    <p id="audioFileName" class="text-gray-500">Click to select your audio file</p>
+                </div>
+                <!-- Audio Preview and Max Duration Display -->
+                <div id="audioPreviewContainer" class="mt-3 p-3 border border-gray-200 rounded-lg hidden">
+                    <audio id="audioPreview" controls class="w-full"></audio>
+                    <p class="text-xs text-gray-500 mt-2">
+                        Max Duration: <span id="audioDuration" class="font-semibold text-gray-700">--:--</span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Audio Start Time Selector (Slider and Input) -->
+            <div id="startTimeContainer" class="hidden">
+                <label for="startTimeInput" class="block text-sm font-medium text-gray-700 mb-2">3. Clip Start Time (seconds)</label>
+                <input type="range" id="startTimeSlider" min="0" max="0" step="0.1" value="0" 
+                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg" 
+                       oninput="syncClipTimes('start', 'slider')">
+                <input type="number" id="startTimeInput" min="0" step="0.1" value="0" placeholder="0.0"
+                       class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                       oninput="syncClipTimes('start', 'input');">
+                <p id="startValidationMessage" class="text-xs text-red-500 mt-1 h-4"></p>
+            </div>
+
+            <!-- Audio End Time Selector (Slider and Input) -->
+            <div id="endTimeContainer" class="hidden">
+                <label for="endTimeInput" class="block text-sm font-medium text-gray-700 mb-2">4. Clip End Time (seconds)</label>
+                <input type="range" id="endTimeSlider" min="0.1" max="0" step="0.1" value="0" 
+                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg" 
+                       oninput="syncClipTimes('end', 'slider')">
+                <input type="number" id="endTimeInput" min="0.1" step="0.1" value="0" placeholder="0.1"
+                       class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                       oninput="syncClipTimes('end', 'input');">
+                <p id="endValidationMessage" class="text-xs text-red-500 mt-1 h-4"></p>
+            </div>
+
+            <!-- Clip Duration Display -->
+            <div id="clipDurationDisplay" class="hidden p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm text-center">
+                Calculated Clip Duration: <span id="currentClipDuration" class="font-bold text-indigo-600">0:00</span>
+            </div>
+
+            <!-- Generate Button -->
+            <button id="generateButton" onclick="generateVideo()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-200 shadow-md disabled:bg-indigo-300" disabled>
+                Generate Video
+            </button>
+        </div>
+
+        <!-- Status and Output Section -->
+        <div id="output-section" class="mt-8">
+            <div id="statusMessage" class="text-center p-3 rounded-lg text-sm transition-all duration-300"></div>
+
+            <div id="videoContainer" class="mt-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-800 mb-3 text-center">Resulting Video</h2>
+                <video id="outputVideo" controls class="w-full h-auto rounded-lg shadow-lg border border-gray-200" style="max-height: 450px;">
+                    Your browser does not support the video tag.
+                </video>
+                <p class="text-center text-gray-500 mt-2 text-sm">Right-click (or long-press on mobile) the video above and select "Save Video As..." to download it.</p>
+            </div>
+
+
+        </div>
+
+    </div>
+
+    <script>
+        const imageFile = document.getElementById('imageFile');
+        const audioFile = document.getElementById('audioFile');
+        const generateButton = document.getElementById('generateButton');
+        const statusMessage = document.getElementById('statusMessage');
+        const outputVideo = document.getElementById('outputVideo');
+        const videoContainer = document.getElementById('videoContainer');
+        
+        // Audio/Duration elements
+        const audioPreviewContainer = document.getElementById('audioPreviewContainer');
+        const audioPreview = document.getElementById('audioPreview');
+        const audioDurationSpan = document.getElementById('audioDuration');
+        
+        // Start Time control elements
+        const startTimeContainer = document.getElementById('startTimeContainer');
+        const startTimeSlider = document.getElementById('startTimeSlider');
+        const startTimeInput = document.getElementById('startTimeInput');
+        const startValidationMessage = document.getElementById('startValidationMessage');
+        
+        // End Time control elements
+        const endTimeContainer = document.getElementById('endTimeContainer');
+        const endTimeSlider = document.getElementById('endTimeSlider');
+        const endTimeInput = document.getElementById('endTimeInput');
+        const endValidationMessage = document.getElementById('endValidationMessage');
+        
+        // New Duration Display
+        const clipDurationDisplay = document.getElementById('clipDurationDisplay');
+        const currentClipDuration = document.getElementById('currentClipDuration');
+
+        let maxAudioDuration = 0; // Global variable to store max duration
+
+        // --- Utility Functions ---
+
+        // Helper function to update file name display
+        function displayFileName(inputId, nameId) {
+            const input = document.getElementById(inputId);
+            const nameDisplay = document.getElementById(nameId);
+            if (input.files.length > 0) {
+                nameDisplay.textContent = 'Selected: ' + input.files[0].name;
+                nameDisplay.classList.remove('text-gray-500');
+                nameDisplay.classList.add('text-indigo-600', 'font-medium');
+            } else {
+                nameDisplay.textContent = inputId.includes('image') ? 'Click to select your image file' : 'Click to select your audio file';
+                nameDisplay.classList.add('text-gray-500');
+                nameDisplay.classList.remove('text-indigo-600', 'font-medium');
+            }
+            checkInputs();
+        }
+
+        // Helper function to format seconds into M:SS
+        function formatDuration(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            const formattedSeconds = remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds;
+            return `${minutes}:${formattedSeconds}`;
+        }
+
+        // --- Validation and UI Sync ---
+
+        // Syncs the slider and numeric input for both start and end times, and enforces rules.
+        function syncClipTimes(type, source) {
+            let startValue = parseFloat(startTimeInput.value);
+            let endValue = parseFloat(endTimeInput.value);
+            const minClipDuration = 0.1;
+            
+            // 1. Get the value from the source that was changed
+            let newValue;
+            if (type === 'start') {
+                newValue = (source === 'slider') ? parseFloat(startTimeSlider.value) : parseFloat(startTimeInput.value);
+                startValue = newValue;
+            } else { // type === 'end'
+                newValue = (source === 'slider') ? parseFloat(endTimeSlider.value) : parseFloat(endTimeInput.value);
+                endValue = newValue;
+            }
+
+            // 2. Enforce min/max rules and update controls
+            if (type === 'start') {
+                startValue = Math.max(0, Math.min(newValue, maxAudioDuration - minClipDuration));
+                
+                // If start pushes past end, push end forward (maintaining min duration)
+                if (startValue >= endValue - minClipDuration) {
+                     endValue = Math.min(startValue + minClipDuration, maxAudioDuration);
+                }
+
+            } else { // type === 'end'
+                endValue = Math.min(maxAudioDuration, Math.max(newValue, minClipDuration));
+                
+                 // If end pulls back before start, pull start back (maintaining min duration)
+                if (endValue <= startValue + minClipDuration) {
+                    startValue = Math.max(0, endValue - minClipDuration);
+                }
+            }
+
+            // 3. Update all controls to reflect the corrected values
+            startTimeInput.value = startValue.toFixed(1);
+            startTimeSlider.value = startValue.toFixed(1);
+            endTimeInput.value = endValue.toFixed(1);
+            endTimeSlider.value = endValue.toFixed(1);
+            
+            // 4. Update the calculated duration display
+            const duration = endValue - startValue;
+            currentClipDuration.textContent = formatDuration(duration);
+
+            // 5. Scrub audio preview to the new start time
+            // Only scrub when the audio is not already actively playing to prevent jumpiness
+            if (audioPreview.paused) {
+                const timeToScrub = Math.min(startValue, audioPreview.duration - 0.01);
+                if (isFinite(timeToScrub) && timeToScrub >= 0) {
+                     audioPreview.currentTime = timeToScrub;
+                }
+            }
+            
+            // 6. Re-run validation and input check
+            checkInputs();
+        }
+
+        // Validation for the entire clip (start time + end time)
+        function validateClip() {
+            const startTime = parseFloat(startTimeInput.value);
+            const endTime = parseFloat(endTimeInput.value);
+            const minClipDuration = 0.1;
+            
+            // Reset messages
+            startValidationMessage.textContent = '';
+            endValidationMessage.textContent = '';
+            
+            // 1. Check if max duration is valid
+            if (maxAudioDuration <= minClipDuration) {
+                startValidationMessage.textContent = 'Audio file is too short (min 0.1s needed).';
+                return false;
+            }
+
+            // 2. Validate bounds
+            if (startTime < 0 || startTime >= maxAudioDuration) {
+                startValidationMessage.textContent = 'Invalid start time.';
+                return false;
+            }
+
+            if (endTime <= minClipDuration || endTime > maxAudioDuration) {
+                endValidationMessage.textContent = 'Invalid end time.';
+                return false;
+            }
+
+            // 3. Validate Clip Length (End > Start + min duration)
+            if (endTime - startTime < minClipDuration) {
+                endValidationMessage.textContent = `Clip duration must be at least ${minClipDuration} seconds.`;
+                startValidationMessage.textContent = `Clip duration must be at least ${minClipDuration} seconds.`;
+                return false;
+            }
+            
+            // Update slider boundaries for smooth scrubbing
+            startTimeSlider.max = (endTime - minClipDuration).toFixed(1);
+            endTimeSlider.min = (startTime + minClipDuration).toFixed(1);
+
+            return true;
+        }
+
+        // Check if all files are selected and inputs are valid to enable the button
+        function checkInputs() {
+            const filesSelected = imageFile.files.length > 0 && audioFile.files.length > 0;
+            const controlsVisible = !startTimeContainer.classList.contains('hidden');
+            
+            let isValid = true;
+            if (controlsVisible) {
+                isValid = validateClip();
+            }
+
+            generateButton.disabled = !(filesSelected && isValid);
+        }
+
+        // Function to handle audio file upload, display name, preview, and duration
+        function loadAudioPreview() {
+            displayFileName('audioFile', 'audioFileName');
+
+            // 2. Reset controls
+            maxAudioDuration = 0;
+            audioPreviewContainer.classList.add('hidden');
+            startTimeContainer.classList.add('hidden');
+            endTimeContainer.classList.add('hidden');
+            clipDurationDisplay.classList.add('hidden');
+            startTimeInput.value = 0;
+            endTimeInput.value = '';
+            audioDurationSpan.textContent = '--:--';
+            
+            // Remove previous event listener before loading new audio
+            audioPreview.removeEventListener('timeupdate', checkClipPlayback);
+
+            const file = audioFile.files[0];
+
+            if (file) {
+                const audioUrl = URL.createObjectURL(file);
+                audioPreview.src = audioUrl;
+                
+                // 3. Get and display duration once metadata is loaded
+                audioPreview.onloadedmetadata = () => {
+                    const duration = audioPreview.duration;
+                    if (isFinite(duration) && duration > 0.1) { // Min duration check
+                        maxAudioDuration = duration; 
+                        audioDurationSpan.textContent = formatDuration(duration);
+                        
+                        // Show controls
+                        startTimeContainer.classList.remove('hidden');
+                        endTimeContainer.classList.remove('hidden');
+                        clipDurationDisplay.classList.remove('hidden');
+                        audioPreviewContainer.classList.remove('hidden');
+
+                        // Set up Slider limits and default values
+                        startTimeSlider.max = duration.toFixed(1);
+                        startTimeInput.max = duration.toFixed(1);
+
+                        endTimeSlider.max = duration.toFixed(1);
+                        endTimeInput.max = duration.toFixed(1);
+
+                        startTimeInput.value = 0.0;
+                        endTimeInput.value = duration.toFixed(1);
+                        
+                        // Set up the clip playback limiter
+                        audioPreview.addEventListener('timeupdate', checkClipPlayback);
+
+                    } else {
+                        audioDurationSpan.textContent = 'Audio too short/invalid.';
+                    }
+                    
+                    // Initial sync and check
+                    syncClipTimes('end', 'input'); 
+                    checkInputs();
+                };
+
+                // Handle potential load errors
+                audioPreview.onerror = (e) => {
+                    console.error("Error loading audio for preview:", e);
+                    audioDurationSpan.textContent = 'Error loading audio.';
+                    audioPreviewContainer.classList.remove('hidden');
+                    URL.revokeObjectURL(audioUrl);
+                    checkInputs();
+                };
+
+            } else {
+                audioPreviewContainer.classList.add('hidden');
+            }
+            checkInputs();
+        }
+        
+        // --- Clip Playback Limiter ---
+        // This function is attached to the audioPreview timeupdate event
+        function checkClipPlayback() {
+            const endTime = parseFloat(endTimeInput.value);
+            // If the audio current time crosses the selected end time, pause it and reset to start
+            if (audioPreview.currentTime >= endTime) {
+                audioPreview.pause();
+                audioPreview.currentTime = parseFloat(startTimeInput.value);
+            }
+        }
+
+
+        // --- Status and Generation Logic ---
+
+        // Display a transient status message
+        function setStatus(message, type = 'info') {
+            let bgColor, textColor;
+            switch (type) {
+                case 'success':
+                    bgColor = 'bg-green-100';
+                    textColor = 'text-green-700';
+                    break;
+                case 'error':
+                    bgColor = 'bg-red-100';
+                    textColor = 'text-red-700';
+                    break;
+                case 'loading':
+                    bgColor = 'bg-blue-100';
+                    textColor = 'text-blue-700';
+                    break;
+                default:
+                    bgColor = 'bg-gray-100';
+                    textColor = 'text-gray-700';
+            }
+            statusMessage.className = `text-center p-3 rounded-lg text-sm ${bgColor} ${textColor} transition-all duration-300`;
+            statusMessage.innerHTML = message;
+        }
+
+        async function generateVideo() {
+            if (generateButton.disabled) return;
+
+            // Final validation before starting
+            if (!validateClip()) {
+                setStatus('Error: Please fix the start and end time errors before generating.', 'error');
+                return;
+            }
+            
+            // Stop preview audio if it's playing
+            audioPreview.pause();
+
+            setStatus('Processing... Please wait while the video is being prepared.', 'loading');
+            generateButton.disabled = true;
+            videoContainer.classList.add('hidden');
+
+            const imageFileObj = imageFile.files[0];
+            const audioFileObj = audioFile.files[0];
+
+            const startTime = parseFloat(startTimeInput.value);
+            const endTime = parseFloat(endTimeInput.value);
+            const videoDuration = endTime - startTime; // Calculated duration
+
+            try {
+                // 1. Load Audio and decode into buffer
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const audioBuffer = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => audioContext.decodeAudioData(reader.result, resolve, reject);
+                    reader.onerror = reject;
+                    reader.readAsArrayBuffer(audioFileObj);
+                });
+                
+                // 2. Load Image
+                const imageUrl = URL.createObjectURL(imageFileObj);
+                const img = new Image();
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                    img.src = imageUrl;
+                });
+
+                // 3. Create a temporary canvas and draw the image
+                const width = img.naturalWidth;
+                const height = img.naturalHeight;
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // 4. Record the video stream from the canvas
+                const stream = canvas.captureStream(30); // Capture at 30 FPS
+                
+                // Remove existing audio tracks if any (captureStream might add a silent one)
+                stream.getAudioTracks().forEach(track => stream.removeTrack(track));
+                
+                // 5. Setup audio source and connect to a stream destination
+                const audioSource = audioContext.createBufferSource();
+                audioSource.buffer = audioBuffer;
+                const destination = audioContext.createMediaStreamDestination();
+                audioSource.connect(destination);
+
+                // Start audio playback: start(when, offset, duration)
+                // Use the specified offset (startTime) for the calculated duration.
+                audioSource.start(0, startTime, videoDuration);
+
+                const newAudioTrack = destination.stream.getAudioTracks()[0];
+                stream.addTrack(newAudioTrack);
+
+
+                // 6. Use MediaRecorder to compile the stream
+                const mimeType = 'video/webm; codecs="vp8, opus"';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                     setStatus(`Error: Your browser does not support the required video format (${mimeType}). Try updating your browser.`, 'error');
+                     generateButton.disabled = false;
+                     return;
+                }
+                
+                const recorder = new MediaRecorder(stream, { mimeType });
+                const chunks = [];
+
+                recorder.ondataavailable = (e) => chunks.push(e.data);
+
+                recorder.onstop = () => {
+                    // Create the final video blob
+                    const videoBlob = new Blob(chunks, { type: 'video/webm' });
+                    const finalVideoUrl = URL.createObjectURL(videoBlob);
+                    
+                    // Display the video
+                    outputVideo.src = finalVideoUrl;
+                    videoContainer.classList.remove('hidden');
+                    setStatus('Video successfully created! Use the controls to play or right-click to save.', 'success');
+
+                    // Clean up temporary URLs
+                    URL.revokeObjectURL(imageUrl);
+                    generateButton.disabled = false;
+                };
+
+                // Start recording and stop after the calculated video duration
+                recorder.start();
+                setTimeout(() => {
+                    // Stop the audio source and the recording
+                    if (audioSource) {
+                        try { audioSource.stop(); } catch (e) { /* ignore if already stopped */ }
+                    }
+                    if (recorder.state !== 'inactive') {
+                        recorder.stop();
+                    }
+                    // Stop the canvas stream
+                    stream.getTracks().forEach(track => track.stop());
+                }, videoDuration * 1000);
+
+                // Handle errors during recording
+                recorder.onerror = (e) => {
+                    setStatus(`An error occurred during recording: ${e.error.name}`, 'error');
+                    generateButton.disabled = false;
+                };
+
+            } catch (error) {
+                console.error("Video Generation Error:", error);
+                setStatus(`An unexpected error occurred: ${error.message}`, 'error');
+                generateButton.disabled = false;
+            }
+        }
+
+        // Initial setup
+        checkInputs(); // Run once on load
+        setStatus('Ready to combine your files.', 'info');
+
+    </script>
+</body>
+</html>

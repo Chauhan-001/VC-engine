@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Social Media Image Cropper</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for clean borders and box shadows */
+        .card {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        /* Style for the canvas outputs to look like images */
+        canvas {
+            display: block;
+            width: 100%;
+            background-color: #f3f4f6;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+
+    <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <header class="text-center mb-12">
+            <h1 class="text-5xl font-extrabold text-indigo-700">Media Crop Genius</h1>
+            <p class="mt-3 text-xl text-gray-600">Instantly generate perfectly sized images for all your social platforms.</p>
+        </header>
+
+        <!-- Image Upload Section -->
+        <div id="upload-section" class="mb-10 p-6 bg-white rounded-xl shadow-lg transition-all duration-300">
+            <label for="imageUpload" class="block text-xl font-medium text-gray-700 mb-4">
+                Step 1: Upload Your Original Image
+            </label>
+            <input type="file" id="imageUpload" accept="image/*" class="w-full text-lg text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+        </div>
+
+        <!-- Working Area: Original Preview and Outputs -->
+        <div id="working-area" class="hidden">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Original Image Preview Card -->
+                <div class="lg:col-span-1 p-6 bg-white rounded-xl shadow-lg card">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Original Image Preview</h2>
+                    <img id="original-image-preview" class="w-full h-auto rounded-lg mb-4 max-h-96 object-contain" alt="Original Image" style="display: none;">
+                    <div id="original-dims" class="text-sm text-gray-500 mt-2"></div>
+                </div>
+
+                <!-- Cropped Outputs Section -->
+                <div class="lg:col-span-2">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Step 2: Cropped Social Media Formats</h2>
+                    <div id="outputs-grid" class="grid sm:grid-cols-2 gap-6">
+                        <!-- Output cards will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const imageUpload = document.getElementById('imageUpload');
+        const originalImagePreview = document.getElementById('original-image-preview');
+        const workingArea = document.getElementById('working-area');
+        const outputsGrid = document.getElementById('outputs-grid');
+        const originalDims = document.getElementById('original-dims');
+
+        // Define the target social media formats with their Aspect Ratios (Width:Height)
+        const socialMediaFormats = [
+            { name: "Instagram Square Post", ratioW: 1, ratioH: 1, example: "1080x1080" },
+            { name: "YouTube Thumbnail/Video", ratioW: 16, ratioH: 9, example: "1280x720" },
+            { name: "Instagram Portrait Post", ratioW: 4, ratioH: 5, example: "1080x1350" },
+            { name: "Instagram Story/Reel", ratioW: 9, ratioH: 16, example: "1080x1920" },
+            { name: "LinkedIn Profile Banner", ratioW: 4, ratioH: 1, example: "1584x396" },
+            { name: "Twitter/X Post Image", ratioW: 16, ratioH: 9, example: "1200x675" },
+        ];
+
+        let loadedImage = new Image();
+        let currentFile = null;
+
+        // --- Core Cropping Logic (Center Crop) ---
+        /**
+         * Calculates the crop area (x, y, w, h) for a center crop based on target ratio.
+         * @param {HTMLImageElement} img The source image element.
+         * @param {number} targetRatioW Target width component of the ratio (e.g., 16).
+         * @param {number} targetRatioH Target height component of the ratio (e.g., 9).
+         * @param {HTMLCanvasElement} canvas The canvas element to draw onto.
+         */
+        function cropAndDisplay(img, targetRatioW, targetRatioH, canvas) {
+            const ctx = canvas.getContext('2d');
+            const targetRatio = targetRatioW / targetRatioH;
+
+            const imgW = img.naturalWidth;
+            const imgH = img.naturalHeight;
+            const imgRatio = imgW / imgH;
+
+            let cropW, cropH, cropX, cropY;
+
+            // Step 1: Calculate the Crop Area on the Source Image
+            if (imgRatio > targetRatio) {
+                // Image is wider than the target aspect ratio (too wide)
+                cropH = imgH;
+                cropW = imgH * targetRatio;
+                cropX = (imgW - cropW) / 2; // Center horizontally
+                cropY = 0;
+            } else {
+                // Image is taller than the target aspect ratio (too tall)
+                cropW = imgW;
+                cropH = imgW / targetRatio;
+                cropX = 0;
+                cropY = (imgH - cropH) / 2; // Center vertically
+            }
+
+            // Step 2: Set the Canvas Display Size (for consistent UI)
+            const displayW = 300; // Fixed width for display
+            const displayH = displayW / targetRatio;
+            canvas.width = displayW;
+            canvas.height = displayH;
+            
+            // Step 3: Draw the cropped image onto the canvas
+            // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+            ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, displayW, displayH);
+        }
+
+        /**
+         * Generates the HTML card for a single output format.
+         */
+        function generateOutputCard(format) {
+            const cardId = `card-${format.ratioW}x${format.ratioH}`;
+            const canvasId = `canvas-${format.ratioW}x${format.ratioH}`;
+
+            return `
+                <div id="${cardId}" class="p-4 bg-white rounded-xl shadow-md card flex flex-col items-center">
+                    <h3 class="text-lg font-semibold text-indigo-600 mb-3">${format.name} (${format.ratioW}:${format.ratioH})</h3>
+                    <p class="text-xs text-gray-500 mb-3">Example size: ${format.example}</p>
+                    <div class="w-full mb-4 rounded-lg overflow-hidden border border-gray-200">
+                        <canvas id="${canvasId}" data-w="${format.ratioW}" data-h="${format.ratioH}"></canvas>
+                    </div>
+                    <button 
+                        data-canvas-id="${canvasId}" 
+                        data-name="${format.name.replace(/\s/g, '-')}"
+                        class="download-btn w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full transition duration-150 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+                    >
+                        Download (.png)
+                    </button>
+                </div>
+            `;
+        }
+
+        // --- Event Handlers ---
+
+        imageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            currentFile = file;
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                // Update original image preview
+                originalImagePreview.src = e.target.result;
+                originalImagePreview.style.display = 'block';
+                workingArea.classList.remove('hidden');
+
+                // Load the image data into the global Image object
+                loadedImage.onload = () => {
+                    originalDims.textContent = `Dimensions: ${loadedImage.naturalWidth}px x ${loadedImage.naturalHeight}px`;
+                    renderAllCrops();
+                };
+                loadedImage.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        // Delegate listener for download buttons
+        outputsGrid.addEventListener('click', (event) => {
+            if (event.target.classList.contains('download-btn')) {
+                const button = event.target;
+                const canvasId = button.getAttribute('data-canvas-id');
+                const name = button.getAttribute('data-name');
+                downloadCanvasAsImage(canvasId, name);
+            }
+        });
+
+
+        /**
+         * Iterates through all defined formats and renders the cropped image.
+         */
+        function renderAllCrops() {
+            if (!loadedImage.complete || loadedImage.naturalWidth === 0) {
+                console.error("Image not fully loaded.");
+                return;
+            }
+
+            // 1. Clear and re-populate the output grid
+            outputsGrid.innerHTML = socialMediaFormats.map(generateOutputCard).join('');
+
+            // 2. Process each canvas
+            socialMediaFormats.forEach(format => {
+                const canvasId = `canvas-${format.ratioW}x${format.ratioH}`;
+                const canvas = document.getElementById(canvasId);
+                if (canvas) {
+                    cropAndDisplay(loadedImage, format.ratioW, format.ratioH, canvas);
+                }
+            });
+        }
+
+        /**
+         * Triggers a download for a given canvas content.
+         */
+        function downloadCanvasAsImage(canvasId, baseName) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+
+            // Use a higher resolution canvas for download (e.g., 1000px wide if the ratio allows)
+            const targetRatioW = canvas.dataset.w;
+            const targetRatioH = canvas.dataset.h;
+            const targetRatio = targetRatioW / targetRatioH;
+
+            // Determine download dimensions (use 1000px wide as a base, constrained by ratio)
+            const downloadW = 1000;
+            const downloadH = downloadW / targetRatio;
+
+            // Create a temporary, high-resolution canvas for export
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = downloadW;
+            tempCanvas.height = downloadH;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            // Re-run the cropping logic but draw to the high-res canvas
+            const imgW = loadedImage.naturalWidth;
+            const imgH = loadedImage.naturalHeight;
+            const imgRatio = imgW / imgH;
+
+            let cropW, cropH, cropX, cropY;
+
+            if (imgRatio > targetRatio) {
+                cropH = imgH;
+                cropW = imgH * targetRatio;
+                cropX = (imgW - cropW) / 2;
+                cropY = 0;
+            } else {
+                cropW = imgW;
+                cropH = imgW / targetRatio;
+                cropX = 0;
+                cropY = (imgH - cropH) / 2;
+            }
+            // Draw original cropped area to the high-res canvas
+            tempCtx.drawImage(loadedImage, cropX, cropY, cropW, cropH, 0, 0, downloadW, downloadH);
+
+
+            // Trigger download
+            const dataURL = tempCanvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = `CropGenius_${baseName}_${targetRatioW}x${targetRatioH}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        
+        // Initial setup on load to show instructions
+        document.addEventListener('DOMContentLoaded', () => {
+            originalDims.textContent = 'Upload an image above to see the crops.';
+        });
+
+    </script>
+</body>
+</html>

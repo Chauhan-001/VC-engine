@@ -1,0 +1,173 @@
+<!--- COMPLETED -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Background Changer | VCengine</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin:0;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+      padding: 40px 30px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+    h1 { color: #0d9488; font-size: 28px; margin-bottom:10px; }
+    p { color:#555; font-size:15px; margin-bottom:20px; }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid #94a3b8;
+      margin-bottom: 15px;
+      background: #f1f5f9;
+    }
+    input[type="file"] { cursor: pointer; }
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: #0d9488;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+    }
+    button:hover:not(:disabled) { background:#0f766e; }
+    button:disabled { background:#94a3b8; cursor:not-allowed; }
+    canvas { margin-top: 15px; max-width:100%; border-radius:10px; }
+    footer { margin-top:30px; font-size:12px; color:#777; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🖼 Background Changer</h1>
+    <p>Upload an image to remove the background or replace it with a new one.</p>
+
+    <input type="file" id="imageInput" accept="image/*">
+    <select id="modeSelect">
+      <option value="remove">Remove Background (Transparent)</option>
+      <option value="replace">Replace Background</option>
+    </select>
+    <input type="file" id="bgInput" accept="image/*" style="display:none;">
+    <button id="processBtn" onclick="processImage()">Process Image</button>
+
+    <canvas id="canvas"></canvas>
+
+    <footer>Made with 💚 by VCengine</footer>
+  </div>
+
+  <!-- BodyPix -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.8.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0/dist/body-pix.min.js"></script>
+
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const bgInput = document.getElementById('bgInput');
+    const modeSelect = document.getElementById('modeSelect');
+    const processBtn = document.getElementById('processBtn');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let originalImage = null;
+    let bgImage = null;
+
+    modeSelect.addEventListener('change', () => {
+      if(modeSelect.value === 'replace') bgInput.style.display='block';
+      else bgInput.style.display='none';
+    });
+
+    imageInput.addEventListener('change', (e) => {
+      originalImage = new Image();
+      originalImage.onload = () => {
+        canvas.width = originalImage.width;
+        canvas.height = originalImage.height;
+        ctx.drawImage(originalImage,0,0);
+      }
+      originalImage.src = URL.createObjectURL(e.target.files[0]);
+    });
+
+    bgInput.addEventListener('change', (e)=>{
+      bgImage = new Image();
+      bgImage.src = URL.createObjectURL(e.target.files[0]);
+    });
+
+    async function processImage() {
+      if(!originalImage) return alert("Please upload your image first.");
+      processBtn.disabled = true;
+      processBtn.innerText = "Processing...";
+
+      const net = await bodyPix.load({
+        architecture: 'MobileNetV1',
+        outputStride: 16,
+        multiplier: 0.75,
+        quantBytes: 2
+      });
+
+      const segmentation = await net.segmentPerson(originalImage, {
+        internalResolution: 'medium',
+        segmentationThreshold: 0.7
+      });
+
+      const maskBackground = true;
+      const foregroundColor = {r:255, g:255, b:255, a:255}; // opaque white for person
+      const backgroundColor = {r:0,g:0,b:0,a:0}; // transparent for background
+      const mask = bodyPix.toMask(segmentation, foregroundColor, backgroundColor);
+
+      // draw background replacement or transparent
+      if(modeSelect.value==='replace' && bgImage) {
+        // draw bg first
+        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+        // draw person only
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.putImageData(mask,0,0);
+        tempCtx.globalCompositeOperation='source-in';
+        tempCtx.drawImage(originalImage,0,0);
+        ctx.drawImage(tempCanvas,0,0);
+      } else {
+        // remove background
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.putImageData(mask,0,0);
+        tempCtx.globalCompositeOperation='source-in';
+        tempCtx.drawImage(originalImage,0,0);
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(tempCanvas,0,0);
+      }
+
+      processBtn.disabled = false;
+      processBtn.innerText = "Process Image";
+
+      // Enable download link
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'output.png';
+      link.textContent = '⬇️ Download Image';
+      link.style.display = 'block';
+      link.style.marginTop = '15px';
+      link.style.color = '#0d9488';
+      link.style.fontWeight = 'bold';
+      canvas.parentNode.appendChild(link);
+    }
+  </script>
+
+</body>
+</html>
