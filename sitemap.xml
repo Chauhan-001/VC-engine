@@ -1,63 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://vc-engine.vercel.app/index.html</loc>
-    <lastmod>2023-10-01</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://vcengine.online/</loc>
+    <lastmod>2024-10-01</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://vc-engine.vercel.app/pdf-merger.html</loc>
-    <lastmod>2023-10-01</lastmod>
+    <loc>https://vcengine.online/pdf-merger.html</loc>
+    <lastmod>2024-10-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://vc-engine.vercel.app/pdf-page-deleter.html</loc>
-    <lastmod>2023-10-01</lastmod>
+    <loc>https://vcengine.online/pdf-compressor.html</loc>
+    <lastmod>2024-10-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://vc-engine.vercel.app/pdf-compressor.html</loc>
-    <lastmod>2023-10-01</lastmod>
+    <loc>https://vcengine.online/pdf-page-deleter.html</loc>
+    <lastmod>2024-10-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://vc-engine.vercel.app/resume-maker.html</loc>
-    <lastmod>2023-10-01</lastmod>
+    <loc>https://vcengine.online/extract-audio.html</loc>
+    <lastmod>2024-10-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://vc-engine.vercel.app/extract-audio.html</loc>
-    <lastmod>2023-10-01</lastmod>
+    <loc>https://vcengine.online/image-compressor.html</loc>
+    <lastmod>2024-10-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://vc-engine.vercel.app/remov-change-bgimage.html</loc>
-    <lastmod>2023-10-01</lastmod>
+    <loc>https://vcengine.online/crop-media-image.html</loc>
+    <lastmod>2024-10-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://vc-engine.vercel.app/merge-photo-audio.html</loc>
-    <lastmod>2023-10-01</lastmod>
+    <loc>https://vcengine.online/merge-photo-audio.html</loc>
+    <lastmod>2024-10-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://vc-engine.vercel.app/crop-media-image.html</loc>
-    <lastmod>2023-10-01</lastmod>
+    <loc>https://vcengine.online/remov-change-bgimage.html</loc>
+    <lastmod>2024-10-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://vc-engine.vercel.app/image-compressor.html</loc>
-    <lastmod>2023-10-01</lastmod>
+    <loc>https://vcengine.online/resume-maker.html</loc>
+    <lastmod>2024-10-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://vcengine.online/audio-trimmer.html</loc>
+    <lastmod>2024-10-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://vcengine.online/audio-video-merger.html</loc>
+    <lastmod>2024-10-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

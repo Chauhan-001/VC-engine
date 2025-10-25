@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free online audio video merger tool. Merge audio and video files, replace or add sound to videos. Supports volume control, ducking, looping, and fading. No sign up required. Secure client-side processing.">
+    <meta name="keywords" content="free audio video merger online, merge audio video online, replace audio in video, video editor online, audio mixer online, volume control, ducking, looping, fading, no sign up, free online tools, vc engine, VCENGINE, online media tools">
+    <meta name="author" content="vc engine">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="en-US">
+    <meta name="revisit-after" content="7 days">
+    <meta name="category" content="Tools">
+    <meta name="rating" content="General">
+    <meta name="googlebot" content="index, follow">
+    <title>Merge Audio & Video - Free Online Audio Video Merger | No Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1349217207880778"
+     crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Blue 500 for a fresh look */
+            --track-color: #374151; /* Gray 700 */
+            --bg-dark: #1f2937; /* Darker Gray for BG */
+            --bg-card: #374151; /* Card Background */
+            --video-color: #6366f1; /* Indigo */
+            --audio-color: #10b981; /* Emerald */
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-dark); 
+            color: white;
+        }
+
+        /* Custom Slider Styling */
+        .custom-slider-container {
+            position: relative;
+            height: 40px;
+            cursor: pointer;
+            touch-action: none;
+            padding: 8px 0;
+        }
+        .slider-track {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 6px;
+            background-color: var(--track-color);
+            border-radius: 3px;
+            width: 100%;
+        }
+        .slider-range {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 8px;
+            background-color: var(--primary-color);
+            border-radius: 4px;
+            transition: left 0.1s, width 0.1s;
+        }
+        .slider-handle {
+            position: absolute;
+            top: 50%;
+            transform: translate(-55%, -50%);
+            width: 12px;
+            height: 28px;
+            background-color: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 3px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+            cursor: grab;
+            z-index: 10;
+        }
+        .slider-handle:active {
+            cursor: grabbing;
+        }
+        input[type="file"] { display: none; }
+        
+        /* Toggle Switch (Looping) */
+        .toggle-switch input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        .toggle-switch input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .input-number {
+            appearance: textfield;
+            -moz-appearance: textfield;
+        }
+        .input-number::-webkit-inner-spin-button, 
+        .input-number::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
+        /* Ducking Indicator */
+        #duck-indicator {
+            background-color: rgba(249, 115, 22, 0.9); /* Orange for Ducking */
+            transition: opacity 0.3s;
+        }
+
+        /* Volume Slider (HTML range input) */
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #4b5563;
+            border-radius: 4px;
+            outline: none;
+            opacity: 0.9;
+            transition: opacity .15s;
+        }
+
+        .volume-slider:hover {
+            opacity: 1;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        }
+        
+        /* Inline SVG Icons (Lucide - simplified outlines) */
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
+            stroke: currentColor;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 min-h-screen">
+
+    <div id="app-container" class="max-w-6xl mx-auto space-y-8">
+        <header class="text-center">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-400">Unified Media Composer</h1>
+            <p class="text-gray-400 mt-1">Synchronize, loop, and mix volume levels for combined media output.</p>
+        </header>
+
+        <!-- MAIN LAYOUT (Controls & Preview) -->
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- LEFT CONTROL PANEL (Uploads and Settings) -->
+            <div class="lg:w-1/3 bg-gray-900 p-6 rounded-xl shadow-2xl h-fit space-y-6">
+                
+                <h2 class="text-xl font-bold text-gray-100 border-b border-gray-700 pb-3">1. Media Sources</h2>
+
+                <!-- Video Upload (Simplified Icon: Video Player) -->
+                <div class="flex flex-col space-y-2">
+                    <label for="video-file" class="py-3 bg-indigo-600 rounded-lg text-center font-semibold cursor-pointer hover:bg-indigo-700 transition duration-200 shadow-md">
+                        <svg class="icon inline mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><path d="M14 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z"/></svg>
+                        Select Video File
+                    </label>
+                    <input type="file" id="video-file" accept="video/*">
+                    <span id="video-status" class="text-sm text-gray-400 truncate text-center">No video selected.</span>
+                </div>
+
+                <!-- Audio Upload (Simplified Icon: Speaker) -->
+                <div class="flex flex-col space-y-2 pb-4 border-b border-gray-700">
+                    <label for="audio-file" class="py-3 bg-emerald-600 rounded-lg text-center font-semibold cursor-pointer hover:bg-emerald-700 transition duration-200 shadow-md">
+                        <svg class="icon inline mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                        Select Replacement Audio
+                    </label>
+                    <input type="file" id="audio-file" accept="audio/*">
+                    <span id="audio-status" class="text-sm text-gray-400 truncate text-center">No audio selected.</span>
+                </div>
+                
+                
+                <h2 class="text-xl font-bold text-gray-100 pb-3">2. Output Adjustments</h2>
+                
+                <!-- Tab Navigation -->
+                <div class="flex space-x-2 p-1 bg-gray-800 rounded-lg">
+                    <button class="tab-button active flex-1 py-2 px-2 rounded-lg text-sm text-gray-300 hover:bg-blue-500 hover:text-gray-900 transition" data-tab="sync">Volume & Ducking</button>
+                    <button class="tab-button flex-1 py-2 px-2 rounded-lg text-sm text-gray-300 hover:bg-blue-500 hover:text-gray-900 transition" data-tab="playback">Playback & Looping</button>
+                </div>
+                
+                <!-- Tab Content -->
+                <div id="settings-tabs-content" class="space-y-4">
+                    
+                    <!-- Tab 1: Volume & Ducking -->
+                    <div id="tab-sync" class="tab-content space-y-4">
+                        
+                        <!-- Track Volume Sliders -->
+                        <div class="p-3 bg-gray-800 rounded-lg space-y-3 border border-blue-500/30">
+                            <h3 class="text-sm font-semibold text-blue-400 border-b border-gray-700 pb-1">Track Volume Levels</h3>
+
+                            <!-- Original Video Volume -->
+                            <div>
+                                <label for="original-video-volume" class="block text-sm text-indigo-300 flex justify-between">
+                                    <span>Original Video Audio</span>
+                                    <span id="original-vol-display" class="font-mono">100%</span>
+                                </label>
+                                <input type="range" id="original-video-volume" min="0" max="100" value="100" class="volume-slider" style="--primary-color: var(--video-color);">
+                            </div>
+
+                            <!-- Replacement Audio Volume -->
+                            <div>
+                                <label for="replacement-audio-volume" class="block text-sm text-emerald-300 flex justify-between">
+                                    <span>Replacement Audio (Music/SFX)</span>
+                                    <span id="replacement-vol-display" class="font-mono">100%</span>
+                                </label>
+                                <input type="range" id="replacement-audio-volume" min="0" max="100" value="100" class="volume-slider" style="--primary-color: var(--audio-color);">
+                            </div>
+                        </div>
+
+
+                        <!-- Quiet Audio Range (Ducking) -->
+                        <div class="p-3 bg-gray-800 rounded-lg space-y-2 border border-orange-500/30">
+                            <label class="block text-sm font-semibold text-orange-400">Quiet Audio Range (Ducking)</label>
+                            <p class="text-xs text-gray-400">The **Replacement Audio** volume is reduced to **10%** within this range (relative to final output).</p>
+                            
+                            <div class="flex justify-between items-center pt-2">
+                                <label for="quiet-start-time" class="text-sm text-gray-400">Start Time (s):</label>
+                                <input type="number" id="quiet-start-time" value="0.0" min="0" step="0.1" 
+                                    class="input-number w-20 text-right bg-gray-700 border border-gray-600 rounded-md p-1 text-sm focus:ring-orange-500 focus:border-orange-500">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <label for="quiet-end-time" class="text-sm text-gray-400">End Time (s):</label>
+                                <input type="number" id="quiet-end-time" value="0.0" min="0" step="0.1" 
+                                    class="input-number w-20 text-right bg-gray-700 border border-gray-600 rounded-md p-1 text-sm focus:ring-orange-500 focus:border-orange-500">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab 2: Playback & Looping -->
+                    <div id="tab-playback" class="tab-content hidden space-y-4">
+                        
+                        <div class="p-3 bg-gray-800 rounded-lg space-y-3 border border-blue-500/30">
+                            <h3 class="text-sm font-semibold text-blue-400 border-b border-gray-700 pb-1">Looping Controls</h3>
+                            
+                            <!-- Video Loop Toggle -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-indigo-400">Loop Video Segment</span>
+                                <label class="relative inline-flex items-center cursor-pointer toggle-switch">
+                                    <input type="checkbox" id="video-loop-toggle" value="" class="sr-only peer">
+                                    <div class="w-10 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all slider"></div>
+                                </label>
+                            </div>
+
+                            <!-- Audio Loop Toggle -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-emerald-400">Loop Replacement Audio</span>
+                                <label class="relative inline-flex items-center cursor-pointer toggle-switch">
+                                    <input type="checkbox" id="audio-loop-toggle" value="" class="sr-only peer">
+                                    <div class="w-10 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all slider"></div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <h3 class="text-sm font-semibold text-blue-400 border-b border-gray-700 pb-1 pt-2">Speed & Fading</h3>
+
+                        <!-- Playback Speed -->
+                        <div class="flex items-center justify-between p-2 bg-gray-700 rounded-lg">
+                            <label for="playback-speed" class="text-sm text-gray-300 font-medium">Playback Speed (1.0 = Normal)</label>
+                            <input type="number" id="playback-speed" value="1.0" min="0.1" max="4.0" step="0.1" 
+                                class="input-number w-20 text-right bg-gray-600 border border-gray-500 rounded-md p-1 text-sm font-mono focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Fade In Duration -->
+                        <div class="flex items-center justify-between p-2">
+                            <label for="fade-in-duration" class="text-sm text-gray-400">Fade In (seconds):</label>
+                            <input type="number" id="fade-in-duration" value="0.0" min="0" step="0.1" 
+                                class="input-number w-20 text-right bg-gray-700 border border-gray-600 rounded-md p-1 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Fade Out Duration -->
+                        <div class="flex items-center justify-between p-2">
+                            <label for="fade-out-duration" class="text-sm text-gray-400">Fade Out (seconds):</label>
+                            <input type="number" id="fade-out-duration" value="0.0" min="0" step="0.1" 
+                                class="input-number w-20 text-right bg-gray-700 border border-gray-600 rounded-md p-1 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                         <!-- Audio Start Offset (Sync) -->
+                        <div class="p-3 bg-gray-800 rounded-lg space-y-2 border border-blue-500/30">
+                            <label for="audio-sync-offset" class="block text-sm font-semibold text-blue-400">Audio Start Offset (seconds)</label>
+                            <p class="text-xs text-gray-400">Delay the replacement audio start after the video segment begins.</p>
+                            <div class="flex justify-end">
+                                <input type="number" id="audio-sync-offset" value="0.0" min="0" step="0.1" 
+                                    class="input-number w-24 text-right bg-gray-700 border border-gray-600 rounded-md p-1.5 text-lg font-mono focus:ring-blue-500 focus:border-blue-500 transition">
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- RIGHT PREVIEW & TRIMMING PANEL -->
+            <div class="lg:w-2/3 bg-gray-900 p-6 rounded-xl shadow-2xl space-y-6">
+                <h2 class="text-xl font-bold text-gray-100 border-b border-gray-700 pb-3">Combined Preview & Trimmer</h2>
+
+                <!-- Combined Media Preview Area -->
+                <div id="combined-preview" class="w-full bg-gray-900 aspect-video rounded-lg overflow-hidden relative shadow-lg">
+                    <!-- The actual video element (controls shown if load is successful) -->
+                    <video id="video-element" class="w-full h-full object-contain" preload="metadata" style="display: none;"></video>
+                    <!-- New Audio Element (Hidden, for playback synchronization) -->
+                    <audio id="audio-element" style="display: none;" preload="metadata"></audio>
+
+                    <!-- DUCKING INDICATOR BAR -->
+                    <div id="duck-indicator" class="absolute bottom-0 h-1 opacity-0 transition-opacity" style="left: 0%; width: 0%;"></div>
+
+                    <!-- Simulation/Status/Error Overlay -->
+                    <div id="preview-overlay" class="absolute inset-0 h-full w-full flex flex-col items-center justify-center text-gray-500 text-sm italic bg-gray-900/90 transition-opacity">
+                        Upload video to see the preview.
+                    </div>
+                </div>
+
+                <!-- Trim Controls -->
+                <div id="trim-controls-area" class="space-y-6 pt-4">
+                    <!-- VIDEO TRIMMER -->
+                    <div id="video-trim-container" class="space-y-2 p-4 bg-gray-800 rounded-lg">
+                        <div class="flex justify-between items-center text-gray-300">
+                            <h3 class="font-bold text-lg text-indigo-400">Video Track Selection</h3>
+                            <span class="text-sm">Total: <span id="video-max-duration" class="font-mono text-gray-400">--.--s</span> | Trimmed: <span id="video-duration-display" class="font-mono font-bold text-blue-400">--.--s</span></span>
+                        </div>
+                        <div id="video-slider-visual" class="custom-slider-container" style="--primary-color: var(--video-color);">
+                            <div class="slider-track"></div>
+                            <div id="video-range" class="slider-range"></div>
+                            <div id="video-start-handle" class="slider-handle"></div>
+                            <div id="video-end-handle" class="slider-handle"></div>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-400">
+                            <div>Start: <span id="video-start-time" class="font-mono text-blue-400">0.00s</span></div>
+                            <div>End: <span id="video-end-time" class="font-mono text-blue-400">0.00s</span></div>
+                        </div>
+                    </div>
+
+                    <!-- AUDIO TRIMMER -->
+                    <div id="audio-trim-container" class="space-y-2 p-4 bg-gray-800 rounded-lg">
+                         <div class="flex justify-between items-center text-gray-300">
+                            <h3 class="font-bold text-lg text-emerald-400">New Audio Track Selection</h3>
+                            <span class="text-sm">Total: <span id="audio-max-duration" class="font-mono text-gray-400">--.--s</span> | Trimmed: <span class="font-mono font-bold text-blue-400" id="audio-duration-display">--.--s</span></span>
+                        </div>
+                        <div id="audio-slider-visual" class="custom-slider-container" style="--primary-color: var(--audio-color);">
+                            <div class="slider-track"></div>
+                            <div id="audio-range" class="slider-range"></div>
+                            <div id="audio-start-handle" class="slider-handle"></div>
+                            <div id="audio-end-handle" class="slider-handle"></div>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-400">
+                            <div>Start: <span id="audio-start-time" class="font-mono text-blue-400">0.00s</span></div>
+                            <div>End: <span id="audio-end-time" class="font-mono text-blue-400">0.00s</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- MERGE & DOWNLOAD SECTION (FULL WIDTH) -->
+        <div class="pt-6 border-t border-gray-700 space-y-4">
+             <p id="merge-info" class="text-center text-gray-400 text-sm">
+                Select both video and audio files to begin editing.
+            </p>
+            <button id="merge-button" disabled class="w-full py-4 rounded-xl font-bold text-xl transition duration-300 bg-blue-600 text-gray-900 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-400 shadow-xl hover:shadow-2xl">
+                Merge & Download Final Video
+            </button>
+            <div id="output-message" class="text-center bg-gray-800 p-4 rounded-lg hidden">
+                <p id="output-text" class="text-green-400 font-semibold text-sm"></p>
+                <div id="merge-summary" class="text-xs text-gray-400 mt-2 text-left space-y-1"></div>
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        // --- Global State & Configuration ---
+        const VIDEO_MAX_FALLBACK = 60; 
+        const AUDIO_MAX_FALLBACK = 120; 
+        const EPSILON = 0.05; // Critical tolerance for floating-point comparisons (50ms)
+        const DUCK_VOLUME = 0.1; // Volume multiplier during the "Quiet Range"
+
+        let videoSlider, audioSlider;
+        let videoFileSelected = false;
+        let audioFileSelected = false;
+
+        // --- Utility Functions ---
+        const formatTime = (seconds) => (seconds > 0 ? seconds.toFixed(2) : '0.00') + 's';
+
+        function updateMergeConfig() {
+            const mergeButton = document.getElementById('merge-button');
+            const mergeInfo = document.getElementById('merge-info');
+
+            if (videoFileSelected && audioFileSelected && videoSlider && audioSlider) {
+                mergeButton.disabled = false;
+                
+                const videoDuration = videoSlider.getSelection().duration;
+                const audioDuration = audioSlider.getSelection().duration;
+                const finalDuration = document.getElementById('video-loop-toggle').checked ? videoDuration : Math.min(videoDuration, audioDuration);
+                
+                // Display the expected output duration (if looping, it's the video duration, otherwise the shortest)
+                const isLooping = document.getElementById('video-loop-toggle').checked;
+                mergeInfo.innerHTML = `Ready to merge! <span class="font-bold text-blue-400">Output will be ${formatTime(finalDuration)}</span>${isLooping ? ' (Video Looping Enabled)' : ', limited by the shortest track.'}`;
+                mergeInfo.classList.remove('text-gray-400');
+            } else {
+                mergeButton.disabled = true;
+                mergeInfo.textContent = "Select both video and audio files to begin editing.";
+                mergeInfo.classList.add('text-gray-400');
+            }
+        }
+        
+        // --- Custom Range Slider Class (unchanged but critical) ---
+        class TrimSlider {
+            constructor(elementId, maxDuration) {
+                this.container = document.getElementById(elementId);
+                this.maxDuration = maxDuration;
+                this.startHandle = this.container.querySelector('.slider-handle:nth-child(3)');
+                this.endHandle = this.container.querySelector('.slider-handle:nth-child(4)');
+                this.rangeBar = this.container.querySelector('.slider-range');
+                
+                const baseId = elementId.replace('-slider-visual', '');
+                this.startTimeEl = document.getElementById(baseId + '-start-time');
+                this.endTimeEl = document.getElementById(baseId + '-end-time');
+                this.durationDisplayEl = document.getElementById(baseId + '-duration-display');
+                
+                this.startValue = 0;
+                this.endValue = maxDuration;
+                this.isDragging = null; 
+
+                this.handleMoveBound = this.handleMove.bind(this);
+                this.endDragBound = this.endDrag.bind(this);
+
+                this.render();
+                this.addListeners();
+            }
+
+            pixelToValue(pixelX) {
+                const rect = this.container.getBoundingClientRect();
+                let percentage = (pixelX - rect.left) / rect.width;
+                percentage = Math.max(0, Math.min(1, percentage));
+                return percentage * this.maxDuration;
+            }
+
+            valueToPercentage(value) {
+                return (value / this.maxDuration) * 100;
+            }
+
+            render() {
+                const startPercent = this.valueToPercentage(this.startValue);
+                const endPercent = this.valueToPercentage(this.endValue);
+                
+                this.startHandle.style.left = `${startPercent}%`;
+                this.endHandle.style.left = `${endPercent}%`;
+
+                this.rangeBar.style.left = `${startPercent}%`;
+                this.rangeBar.style.width = `${endPercent - startPercent}%`;
+
+                this.startTimeEl.textContent = formatTime(this.startValue);
+                this.endTimeEl.textContent = formatTime(this.endValue);
+                this.updateDisplayDuration();
+                updateMergeConfig();
+            }
+            
+            updateDisplayDuration() {
+                const duration = this.endValue - this.startValue;
+                this.durationDisplayEl.textContent = formatTime(duration);
+            }
+
+            handleMove(e) {
+                if (e.type.startsWith('touch')) { e.preventDefault(); }
+                let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                if (!clientX) return;
+
+                const newValue = this.pixelToValue(clientX);
+                
+                if (this.isDragging === 'start') {
+                    this.startValue = Math.min(newValue, this.endValue);
+                    this.startValue = Math.max(0, this.startValue); 
+                } else if (this.isDragging === 'end') {
+                    this.endValue = Math.max(newValue, this.startValue);
+                    this.endValue = Math.min(this.maxDuration, this.endValue);
+                }
+
+                // Snap to nearest 0.01s for precision simulation
+                this.startValue = Math.round(this.startValue * 100) / 100;
+                this.endValue = Math.round(this.endValue * 100) / 100;
+                
+                this.render();
+            }
+
+            endDrag() {
+                this.isDragging = null;
+                document.removeEventListener('mousemove', this.handleMoveBound);
+                document.removeEventListener('mouseup', this.endDragBound);
+                document.removeEventListener('touchmove', this.handleMoveBound);
+                document.removeEventListener('touchend', this.endDragBound);
+            }
+
+            startDrag(handle, e) {
+                e.preventDefault(); 
+                this.isDragging = handle;
+                document.addEventListener('mousemove', this.handleMoveBound);
+                document.addEventListener('mouseup', this.endDragBound);
+                document.addEventListener('touchmove', this.handleMoveBound, { passive: false });
+                document.addEventListener('touchend', this.endDragBound);
+            }
+
+            addListeners() {
+                this.startHandle.addEventListener('mousedown', (e) => this.startDrag('start', e));
+                this.endHandle.addEventListener('mousedown', (e) => this.startDrag('end', e));
+                this.startHandle.addEventListener('touchstart', (e) => this.startDrag('start', e));
+                this.endHandle.addEventListener('touchstart', (e) => this.startDrag('end', e));
+            }
+
+            getSelection() {
+                return {
+                    start: this.startValue,
+                    end: this.endValue,
+                    duration: this.endValue - this.startValue
+                };
+            }
+        }
+
+        // --- Tab Control Logic ---
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTabId = button.getAttribute('data-tab');
+                
+                // Deactivate all buttons and hide all content
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+
+                // Activate clicked button and show target content
+                button.classList.add('active');
+                document.getElementById('tab-' + targetTabId).classList.remove('hidden');
+            });
+        });
+
+        // --- Volume Slider Handlers ---
+        const videoElement = document.getElementById('video-element');
+        const audioElement = document.getElementById('audio-element');
+        const originalVolInput = document.getElementById('original-video-volume');
+        const replacementVolInput = document.getElementById('replacement-audio-volume');
+        const originalVolDisplay = document.getElementById('original-vol-display');
+        const replacementVolDisplay = document.getElementById('replacement-vol-display');
+
+        function updateVolume() {
+            const originalVolume = parseFloat(originalVolInput.value) / 100;
+            const replacementVolume = parseFloat(replacementVolInput.value) / 100;
+
+            if (videoElement) {
+                // Original video volume is set directly
+                videoElement.volume = originalVolume; 
+            }
+
+            originalVolDisplay.textContent = originalVolInput.value + '%';
+            replacementVolDisplay.textContent = replacementVolInput.value + '%';
+        }
+
+        originalVolInput.addEventListener('input', updateVolume);
+        replacementVolInput.addEventListener('input', updateVolume);
+
+
+        // --- Playback Speed Handler ---
+        document.getElementById('playback-speed').addEventListener('input', (e) => {
+            const speed = parseFloat(e.target.value) || 1.0;
+            if (videoElement) videoElement.playbackRate = speed;
+            if (audioElement) audioElement.playbackRate = speed;
+        });
+
+        // --- Media Playback Synchronization (CRITICAL FOR PLAYBACK) ---
+        const duckIndicator = document.getElementById('duck-indicator');
+        
+        /**
+         * Applies volume changes and updates the visual ducking indicator.
+         * @param {number} mergedTimelineTime - The current time in the final output timeline (relative to video trim start).
+         * @param {number} finalDuration - The shortest duration of the trimmed tracks, or the video duration if looping.
+         */
+        function applyVolumeControl(mergedTimelineTime, finalDuration) {
+            const quietStart = parseFloat(document.getElementById('quiet-start-time').value) || 0;
+            const quietEnd = parseFloat(document.getElementById('quiet-end-time').value) || 0;
+            const fadeInDuration = parseFloat(document.getElementById('fade-in-duration').value) || 0;
+            const fadeOutDuration = parseFloat(document.getElementById('fade-out-duration').value) || 0;
+            const replacementAudioVolume = parseFloat(replacementVolInput.value) / 100;
+
+            let targetVolumeMultiplier = 1.0;
+            let isDucking = false;
+
+            // 1. Ducking Check (Applies to replacement audio)
+            if (quietEnd > quietStart && mergedTimelineTime >= quietStart && mergedTimelineTime < quietEnd && quietStart < finalDuration) {
+                targetVolumeMultiplier = DUCK_VOLUME; // 0.1
+                isDucking = true;
+            }
+
+            // 2. Fading Check (Applies to replacement audio and overrides ducking)
+            if (!isDucking) {
+                // Fade In
+                if (mergedTimelineTime < fadeInDuration && fadeInDuration > 0) {
+                    targetVolumeMultiplier = mergedTimelineTime / fadeInDuration;
+                } 
+                // Fade Out
+                else if (mergedTimelineTime > finalDuration - fadeOutDuration && fadeOutDuration > 0) {
+                    const timeRemaining = finalDuration - mergedTimelineTime;
+                    targetVolumeMultiplier = timeRemaining / fadeOutDuration;
+                }
+            }
+            
+            // Apply the user's volume setting on top of the calculated multiplier
+            audioElement.volume = Math.max(0, Math.min(1.0, targetVolumeMultiplier * replacementAudioVolume)); 
+
+            // Update Visual Ducking Indicator
+            duckIndicator.style.opacity = isDucking ? '1' : '0';
+        }
+
+        function setupDuckIndicator(finalDuration) {
+            const quietStart = parseFloat(document.getElementById('quiet-start-time').value) || 0;
+            const quietEnd = parseFloat(document.getElementById('quiet-end-time').value) || 0;
+            
+            const effectiveStart = Math.max(0, quietStart);
+            const effectiveEnd = Math.min(finalDuration, quietEnd);
+
+            if (effectiveEnd > effectiveStart && finalDuration > 0) {
+                const startPercent = (effectiveStart / finalDuration) * 100;
+                const widthPercent = ((effectiveEnd - effectiveStart) / finalDuration) * 100;
+                
+                duckIndicator.style.left = `${startPercent}%`;
+                duckIndicator.style.width = `${widthPercent}%`;
+                duckIndicator.style.opacity = '0'; // Start hidden, only shows during playback
+            } else {
+                duckIndicator.style.left = '0%';
+                duckIndicator.style.width = '0%';
+            }
+        }
+
+        // Add listeners to input changes to update duck indicator immediately
+        document.getElementById('quiet-start-time').addEventListener('input', synchronizeMedia);
+        document.getElementById('quiet-end-time').addEventListener('input', synchronizeMedia);
+        document.getElementById('video-loop-toggle').addEventListener('change', updateMergeConfig);
+
+
+        function synchronizeMedia() {
+            if (!videoFileSelected || !audioFileSelected || !videoSlider || !audioSlider) return;
+            
+            const vSelect = () => videoSlider.getSelection();
+            const aSelect = () => audioSlider.getSelection();
+            
+            const syncOffset = parseFloat(document.getElementById('audio-sync-offset').value) || 0;
+            const videoLoop = document.getElementById('video-loop-toggle').checked;
+            const audioLoop = document.getElementById('audio-loop-toggle').checked;
+            
+            const videoDuration = vSelect().duration;
+            const audioDuration = aSelect().duration;
+            
+            // If video looping is enabled, the final output duration is dictated by the video trim duration.
+            // Otherwise, it's the minimum duration of the two tracks.
+            const finalDuration = videoLoop ? videoDuration : Math.min(videoDuration, audioDuration);
+
+            // Setup the visual indicator based on the final duration
+            setupDuckIndicator(finalDuration);
+            updateVolume(); // Apply initial volume settings
+
+            // Set playback speed
+            const speed = parseFloat(document.getElementById('playback-speed').value) || 1.0;
+            videoElement.playbackRate = speed;
+            audioElement.playbackRate = speed;
+
+
+            // 1. Handle seeking with native controls 
+            videoElement.onseeking = () => {
+                const vs = vSelect();
+                // Ensure seeking stays within the trimmed video segment
+                if (videoElement.currentTime < vs.start) {
+                    videoElement.currentTime = vs.start;
+                } else if (videoElement.currentTime > vs.end) {
+                    videoElement.currentTime = vs.end;
+                }
+            };
+            
+            // 1b. Ensure audio syncs immediately after video seek completes
+            videoElement.onseeked = () => {
+                const vs = vSelect();
+                const as = aSelect();
+
+                // Current time relative to the start of the trimmed segment
+                const videoTimeRelativeToTrimStart = videoElement.currentTime - vs.start;
+                const mergedTimelineTime = videoTimeRelativeToTrimStart;
+
+                // Calculate audio target time
+                let targetAudioTime = as.start;
+                if (mergedTimelineTime >= syncOffset) {
+                     const audioPlayedDuration = mergedTimelineTime - syncOffset;
+                     
+                     // Handle Audio Looping (if audio runs out before video does)
+                     if (audioLoop) {
+                         const currentAudioDuration = as.duration;
+                         const loopOffset = audioPlayedDuration % currentAudioDuration;
+                         targetAudioTime = as.start + loopOffset;
+                     } else {
+                         targetAudioTime = as.start + audioPlayedDuration;
+                     }
+                }
+
+                if (mergedTimelineTime >= syncOffset && targetAudioTime < as.end) {
+                    audioElement.currentTime = targetAudioTime;
+                    audioElement.play().catch(e => { /* Ignore potential autoplay issues */ });
+                } else {
+                    audioElement.pause();
+                }
+                applyVolumeControl(mergedTimelineTime, finalDuration);
+            };
+
+            // 2. When video plays/pauses, sync the audio playback
+            videoElement.onplay = () => {
+                const vs = vSelect();
+                
+                // Force video back to the start point if it's near the end/start.
+                if (videoElement.currentTime < vs.start || Math.abs(videoElement.currentTime - vs.end) < EPSILON) {
+                    videoElement.currentTime = vs.start;
+                }
+                
+                // Trigger seeked logic to ensure audio starts correctly
+                videoElement.onseeked();
+            };
+
+            videoElement.onpause = () => {
+                if (!audioElement.paused) {
+                    audioElement.pause();
+                }
+            };
+
+            // 3. Ensure the media stops, loops, and syncs volume continuously
+            videoElement.ontimeupdate = () => {
+                const vs = vSelect();
+                const as = aSelect();
+
+                const videoTimeRelativeToTrimStart = videoElement.currentTime - vs.start;
+                let mergedTimelineTime = videoTimeRelativeToTrimStart;
+                
+                // 3a. Handle Video Looping (the primary timeline controller)
+                if (videoLoop && mergedTimelineTime >= finalDuration - EPSILON) {
+                    videoElement.currentTime = vs.start; // Reset video to trim start
+                    mergedTimelineTime = 0; // Reset merged timeline time
+                    // The ontimeupdate will immediately re-trigger and run the sync logic below
+                    return;
+                } 
+                // 3b. Stop condition (if not looping, or if looping and user manually stopped)
+                else if (!videoLoop && mergedTimelineTime >= finalDuration - EPSILON) {
+                    videoElement.pause();
+                    videoElement.currentTime = vs.end; 
+                    audioElement.pause();
+                    return;
+                }
+
+
+                // 3c. Continuous Sync and Volume Control
+                if (mergedTimelineTime >= syncOffset) {
+                    const audioPlayedDuration = mergedTimelineTime - syncOffset;
+                    
+                    let targetAudioTime = as.start;
+                    
+                    // Handle Audio Looping
+                    if (audioLoop) {
+                        const currentAudioDuration = as.duration;
+                        const loopOffset = audioPlayedDuration % currentAudioDuration;
+                        targetAudioTime = as.start + loopOffset;
+                    } else {
+                        targetAudioTime = as.start + audioPlayedDuration;
+                    }
+
+                    applyVolumeControl(mergedTimelineTime, finalDuration);
+
+                    if (targetAudioTime >= as.end) {
+                        // If audio runs out and is NOT set to loop, pause it
+                        if (!audioLoop) {
+                             audioElement.pause();
+                        } else {
+                            // If audio runs out but IS set to loop, the loop logic above already reset targetAudioTime
+                        }
+                    }
+
+                    if (audioElement.paused && videoElement.playing) {
+                        audioElement.play().catch(e => { /* Ignore potential autoplay issues */ });
+                    }
+                    
+                    // Sync audio time if drift is too large (prevents jumping)
+                    if (Math.abs(audioElement.currentTime - targetAudioTime) > 0.2) {
+                        audioElement.currentTime = targetAudioTime;
+                    }
+                } else {
+                    // Before Sync Offset: Audio paused and volume silenced
+                    audioElement.pause();
+                    audioElement.volume = 0;
+                }
+            };
+        }
+
+        // --- File Input Handlers (Mostly unchanged, but calls synchronizeMedia) ---
+        document.getElementById('video-file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const statusEl = document.getElementById('video-status');
+            const previewOverlay = document.getElementById('preview-overlay');
+            const videoMaxDurationEl = document.getElementById('video-max-duration');
+
+            videoElement.src = ''; 
+            videoElement.removeAttribute('controls');
+            videoElement.volume = parseFloat(originalVolInput.value) / 100; // Apply volume on load
+
+            if (file) {
+                statusEl.textContent = file.name;
+                statusEl.classList.remove('text-gray-400');
+                statusEl.classList.add('text-indigo-400');
+                videoFileSelected = true;
+                
+                const fileUrl = URL.createObjectURL(file);
+                videoElement.src = fileUrl;
+                
+                previewOverlay.innerHTML = `<p class="text-blue-400 font-bold">Loading video: ${file.name}...</p>`;
+
+                videoElement.onloadedmetadata = () => {
+                    const actualDuration = videoElement.duration > 0 ? videoElement.duration : VIDEO_MAX_FALLBACK;
+                    videoMaxDurationEl.textContent = formatTime(actualDuration);
+                    
+                    videoSlider = new TrimSlider('video-slider-visual', actualDuration);
+
+                    previewOverlay.classList.add('hidden');
+                    videoElement.style.display = 'block';
+                    videoElement.setAttribute('controls', '');
+                    synchronizeMedia();
+                };
+
+                videoElement.onerror = () => {
+                    const fallbackDuration = VIDEO_MAX_FALLBACK;
+                    videoMaxDurationEl.textContent = formatTime(fallbackDuration);
+                    videoSlider = new TrimSlider('video-slider-visual', fallbackDuration); 
+                    previewOverlay.innerHTML = `
+                        <p class="text-red-400 font-bold">Preview Error: ${file.name}</p>
+                        <p class="text-xs mt-1 text-gray-400">Trimming controls based on ${formatTime(fallbackDuration)} duration.</p>
+                    `;
+                    previewOverlay.classList.remove('hidden');
+                    videoElement.style.display = 'none';
+                };
+                
+            } else {
+                statusEl.textContent = 'No video selected.';
+                statusEl.classList.remove('text-indigo-400');
+                statusEl.classList.add('text-gray-400');
+                previewOverlay.innerHTML = 'Upload video to see the preview.';
+                previewOverlay.classList.remove('hidden');
+                videoElement.style.display = 'none';
+                videoFileSelected = false;
+                videoMaxDurationEl.textContent = '--.--s';
+            }
+            updateMergeConfig();
+        });
+
+        document.getElementById('audio-file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const statusEl = document.getElementById('audio-status');
+            const audioMaxDurationEl = document.getElementById('audio-max-duration');
+
+            audioElement.src = '';
+
+            if (file) {
+                statusEl.textContent = file.name;
+                statusEl.classList.remove('text-gray-400');
+                statusEl.classList.add('text-emerald-400');
+                audioFileSelected = true;
+                
+                const fileUrl = URL.createObjectURL(file);
+                audioElement.src = fileUrl;
+
+                audioElement.onloadedmetadata = () => {
+                    const actualDuration = audioElement.duration > 0 ? audioElement.duration : AUDIO_MAX_FALLBACK;
+                    audioMaxDurationEl.textContent = formatTime(actualDuration);
+                    audioSlider = new TrimSlider('audio-slider-visual', actualDuration);
+                    synchronizeMedia();
+                };
+            } else {
+                statusEl.textContent = 'No audio selected.';
+                statusEl.classList.remove('text-emerald-400');
+                statusEl.classList.add('text-gray-400');
+                audioFileSelected = false;
+                audioMaxDurationEl.textContent = '--.--s'; 
+            }
+            updateMergeConfig();
+        });
+
+
+        // --- Merge Logic (User-Friendly Output) ---
+        document.getElementById('merge-button').addEventListener('click', () => {
+            if (!videoSlider || !audioSlider) return;
+
+            const videoSelection = videoSlider.getSelection();
+            const audioSelection = audioSlider.getSelection();
+            
+            // Get all output settings
+            const originalAudioVolume = parseFloat(originalVolInput.value) / 100;
+            const replacementAudioVolume = parseFloat(replacementVolInput.value) / 100;
+            const fadeInDuration = parseFloat(document.getElementById('fade-in-duration').value) || 0;
+            const fadeOutDuration = parseFloat(document.getElementById('fade-out-duration').value) || 0;
+            const syncOffset = parseFloat(document.getElementById('audio-sync-offset').value) || 0;
+            let quietStartTime = parseFloat(document.getElementById('quiet-start-time').value) || 0;
+            let quietEndTime = parseFloat(document.getElementById('quiet-end-time').value) || 0;
+            const videoLoop = document.getElementById('video-loop-toggle').checked;
+            const audioLoop = document.getElementById('audio-loop-toggle').checked;
+            const playbackSpeed = parseFloat(document.getElementById('playback-speed').value) || 1.0;
+
+
+            const videoDuration = videoSelection.duration;
+            const audioDuration = audioSelection.duration;
+            const finalDuration = videoLoop ? videoDuration : Math.min(videoDuration, audioDuration);
+
+            // Sanitize quiet range against final duration
+            quietStartTime = Math.min(finalDuration, quietStartTime);
+            quietEndTime = Math.min(finalDuration, quietEndTime);
+            
+            const summaryHTML = `
+                <p class="font-bold text-gray-200 mt-2 border-b border-gray-700 pb-1">Trimming & Length:</p>
+                <ul>
+                    <li><span class="text-indigo-400">Video Trim:</span> ${formatTime(videoSelection.start)} - ${formatTime(videoSelection.end)} (${formatTime(videoDuration)})</li>
+                    <li><span class="text-emerald-400">Audio Trim:</span> ${formatTime(audioSelection.start)} - ${formatTime(audioSelection.end)} (${formatTime(audioDuration)})</li>
+                    <li><span class="text-blue-400">Final Duration:</span> ${formatTime(finalDuration)}</li>
+                </ul>
+                <p class="font-bold text-gray-200 mt-2 border-b border-gray-700 pb-1">Playback & Looping:</p>
+                <ul>
+                    <li><span class="text-gray-300">Playback Speed:</span> ${playbackSpeed.toFixed(1)}x</li>
+                    <li><span class="text-indigo-400">Video Loop:</span> ${videoLoop ? 'Enabled' : 'Disabled'}</li>
+                    <li><span class="text-emerald-400">Audio Loop:</span> ${audioLoop ? 'Enabled' : 'Disabled'}</li>
+                </ul>
+                <p class="font-bold text-gray-200 mt-2 border-b border-gray-700 pb-1">Mix & Synchronization:</p>
+                <ul>
+                    <li><span class="text-indigo-400">Original Audio Volume:</span> ${(originalAudioVolume * 100).toFixed(0)}%</li>
+                    <li><span class="text-emerald-400">Replacement Audio Volume:</span> ${(replacementAudioVolume * 100).toFixed(0)}%</li>
+                    <li><span class="text-blue-400">Audio Start Offset:</span> ${formatTime(syncOffset)}</li>
+                    <li><span class="text-orange-400">Quiet Range (Duck):</span> ${quietEndTime > quietStartTime ? `${formatTime(quietStartTime)} to ${formatTime(quietEndTime)}` : 'None/Disabled'}</li>
+                    <li><span class="text-gray-300">Fading:</span> ${formatTime(fadeInDuration)} In, ${formatTime(fadeOutDuration)} Out</li>
+                </ul>
+            `;
+            
+            // Show success message on UI
+            const outputMessage = document.getElementById('output-message');
+            const outputText = document.getElementById('output-text');
+            const mergeSummary = document.getElementById('merge-summary');
+            
+            outputText.textContent = `✅ Merge parameters finalized! Output duration: ${formatTime(finalDuration)}.`;
+            mergeSummary.innerHTML = summaryHTML;
+            outputMessage.classList.remove('hidden');
+
+            // Disable button briefly to simulate processing
+            const mergeButton = document.getElementById('merge-button');
+            mergeButton.disabled = true;
+            mergeButton.textContent = 'Processing... (Simulated)';
+
+            setTimeout(() => {
+                mergeButton.textContent = 'Merge & Download Final Video';
+                mergeButton.disabled = false;
+            }, 4000); 
+        });
+
+        // Initialize state on page load
+        window.onload = updateMergeConfig;
+
+    </script>
+</body>
+</html>

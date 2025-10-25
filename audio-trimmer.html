@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free online audio trimmer tool. Trim audio files with precision, cut unwanted parts from MP3, WAV, and other formats. Export as WAV. No sign up required. Secure client-side processing.">
+    <meta name="keywords" content="free audio trimmer online, trim audio online, cut audio files, MP3 trimmer, WAV trimmer, audio editor online, no sign up, free online tools, vc engine, VCENGINE, online audio tools">
+    <meta name="author" content="vc engine">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="en-US">
+    <meta name="revisit-after" content="7 days">
+    <meta name="category" content="Tools">
+    <meta name="rating" content="General">
+    <meta name="googlebot" content="index, follow">
+    <title>Audio Trimmer Tool - Free Online Audio Trimming | No Sign Up</title>
+    <!-- Load Tailwind CSS -->
+     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1349217207880778"
+     crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font for time displays */
+        .font-mono {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+        }
+
+        /* The main timeline container which acts as the reference for absolute positioning */
+        .timeline-container {
+            position: relative;
+            height: 40px; /* Increased height for the custom handles */
+            margin-top: 1.5rem; /* More vertical breathing room */
+            margin-bottom: 0.5rem;
+        }
+
+        /* The base track that represents the full audio duration */
+        .timeline-track {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 8px;
+            background-color: #374151; /* Gray-700 */
+            border-radius: 4px;
+        }
+
+        /* The highlighted section representing the current trim selection */
+        .selection-highlight {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 10px; /* Slightly thicker */
+            background-color: #059669; /* Emerald-600 */
+            border-radius: 4px;
+            transition: left 0.05s ease-out, width 0.05s ease-out;
+            z-index: 1;
+        }
+
+        /* The playhead indicator (Red marker for current time) */
+        .playhead-marker {
+            position: absolute;
+            top: 50%;
+            left: 0%; /* Initial position */
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 32px; /* Taller and more noticeable */
+            background-color: #F87171; /* Red-400 */
+            border-radius: 2px;
+            z-index: 3;
+            pointer-events: none;
+            transition: left 0.05s linear;
+        }
+
+        /* --- Custom Draggable Handles (Widgets) --- */
+        .trim-handle {
+            position: absolute;
+            top: 50%;
+            height: 40px; /* Tall for easy click/touch */
+            width: 16px;  /* Wide for easy click/touch */
+            cursor: grab;
+            transform: translate(-50%, -50%); /* Center based on left position */
+            z-index: 5; /* Ensure they are above everything */
+            border: 1px solid #111827;
+            transition: box-shadow 0.1s, transform 0.1s;
+        }
+
+        .trim-handle:hover {
+            box-shadow: 0 0 16px rgba(255, 255, 255, 0.4);
+            transform: translate(-50%, -50%) scale(1.1); /* Slight scaling on hover */
+        }
+
+        /* START Handle: Yellow Triangle */
+        .start-handle {
+            background: #FBBF24; /* Yellow-500 */
+            clip-path: polygon(0% 0%, 100% 50%, 0% 100%); /* Triangle pointing right */
+            left: 0%;
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.8);
+        }
+
+        /* END Handle: Emerald Square/Diamond */
+        .end-handle {
+            background: #10B981; /* Emerald-500 */
+            clip-path: polygon(25% 0%, 75% 0%, 75% 100%, 25% 100%); /* Tall narrow rectangle */
+            left: 100%;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.8);
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans min-h-screen p-4 md:p-8 flex items-center justify-center">
+    <div id="app" class="w-full max-w-4xl bg-gray-800 p-6 md:p-10 rounded-xl shadow-2xl space-y-8">
+        <h1 class="text-3xl font-extrabold text-emerald-400 border-b border-gray-700 pb-3">Audio Trimmer Tool <span class="text-sm font-normal text-gray-400">(WAV Export)</span></h1>
+
+        <!-- File Upload Area (Refined Cloud Widget) -->
+        <div id="upload-section" class="space-y-4">
+            <label class="block text-sm font-medium text-gray-300">Load Audio File</label>
+
+            <!-- Refined Drop Area / Cloud Widget -->
+            <div id="drop-area" class="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center cursor-pointer transition duration-300 hover:border-emerald-400 hover:bg-gray-700/50">
+                <input type="file" id="audio-file-input" accept="audio/*" class="hidden">
+                <!-- NEW Modern Cloud SVG -->
+                <svg class="inline-block w-10 h-10 mb-2 mx-auto text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                </svg>
+                <p class="text-xl font-semibold text-gray-300">Drag & drop your audio file</p>
+                <p class="text-sm text-gray-500">or click to browse local files (MP3, WAV, etc.)</p>
+            </div>
+            
+            <p id="file-info" class="text-gray-400 text-sm hidden pt-2"></p>
+
+            <!-- Timeline and Custom Draggable Widgets -->
+            <div id="timeline-container" class="timeline-container hidden">
+                <div class="timeline-track"></div>
+                <div id="selection-highlight" class="selection-highlight"></div>
+                <!-- Playhead Marker (Added for clearer visual feedback) -->
+                <div id="playhead-marker" class="playhead-marker"></div>
+
+                <!-- Custom Draggable Handle for Start -->
+                <div id="start-handle" class="trim-handle start-handle"></div>
+                <!-- Custom Draggable Handle for End -->
+                <div id="end-handle" class="trim-handle end-handle"></div>
+            </div>
+
+            <!-- Trim Point Indicators -->
+            <div id="trim-indicators" class="flex justify-between text-base font-medium hidden pt-2">
+                <div class="text-yellow-400 flex flex-col items-start">
+                    <span class="text-xs text-gray-400">START:</span>
+                    <span id="start-time-display" class="font-mono">00:00.000</span>
+                </div>
+                <div class="text-emerald-400 flex flex-col items-center">
+                    <span class="text-xs text-gray-400">TRIM LENGTH:</span>
+                    <span id="trim-length-display" class="font-mono">00:00.000</span>
+                </div>
+                <div class="text-yellow-400 flex flex-col items-end">
+                    <span class="text-xs text-gray-400">END:</span>
+                    <span id="end-time-display" class="font-mono">00:00.000</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trimming Interface (Now only player controls and download) -->
+        <div id="trimmer-section" class="space-y-6 hidden pt-4">
+
+            <!-- Audio Player Controls -->
+            <div class="flex items-center justify-between bg-gray-700 p-4 rounded-xl shadow-inner shadow-gray-900/50">
+                <div class="flex items-center space-x-4">
+                    <button id="play-pause-btn" class="p-3 bg-emerald-600 rounded-full hover:bg-emerald-500 active:bg-emerald-700 transition transform hover:scale-105 shadow-lg shadow-emerald-600/30">
+                        <!-- Play Icon -->
+                        <svg id="play-icon" class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v14zM16 17H8V7h8v10zM9.5 8.5v7l6-3.5-6-3.5z"></path></svg>
+                        <!-- Pause Icon -->
+                        <svg id="pause-icon" class="w-6 h-6 fill-current hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                    </button>
+                    <span id="current-time-display" class="text-xl font-mono text-white font-bold">00:00.000</span>
+                </div>
+                <div class="text-gray-300 text-sm">
+                    Total Duration: <span id="total-duration-display" class="font-mono text-base font-semibold">00:00.000</span>
+                </div>
+            </div>
+
+            <!-- Download Button -->
+            <button id="trim-download-btn" class="w-full py-4 bg-yellow-500 text-gray-900 font-extrabold text-lg rounded-xl shadow-lg hover:bg-yellow-400 transition transform hover:scale-[1.005] active:scale-100 shadow-yellow-500/40">
+                Trim & Download WAV File
+            </button>
+        </div>
+
+        <!-- Custom Message Box (Replaces alert()) -->
+        <div id="message-box" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 items-center justify-center hidden">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-sm w-full text-center space-y-4 border-t-4 border-emerald-500">
+                <p id="message-text" class="text-lg font-semibold"></p>
+                <button id="message-close-btn" class="px-4 py-2 bg-emerald-600 rounded hover:bg-emerald-500">Close</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Global state for Firebase (Required for Canvas environment, though not used for storage here)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // --- Core Audio Variables ---
+        let audioCtx;
+        let audioBuffer = null;
+        let currentAudioSource = null;
+        let totalDuration = 0;
+        let playStartTime = 0;
+        let currentPlaybackTime = 0;
+        let isPlaying = false;
+        let animationFrameId = null;
+        let isScrubbing = false;
+
+        // --- Draggable Handle State (Replaces Slider Values) ---
+        let startVal = 0; // percentage
+        let endVal = 100; // percentage
+        let activeDragHandle = null; // null, 'start', or 'end'
+
+        // --- DOM Elements ---
+        const fileInput = document.getElementById('audio-file-input');
+        const dropArea = document.getElementById('drop-area');
+        const fileInfo = document.getElementById('file-info');
+        const trimmerSection = document.getElementById('trimmer-section');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const currentTimeDisplay = document.getElementById('current-time-display');
+        const totalDurationDisplay = document.getElementById('total-duration-display');
+        const startTimeDisplay = document.getElementById('start-time-display');
+        const endTimeDisplay = document.getElementById('end-time-display');
+        const trimLengthDisplay = document.getElementById('trim-length-display');
+
+        // New Handle and Timeline Elements
+        const startHandle = document.getElementById('start-handle');
+        const endHandle = document.getElementById('end-handle');
+        const trimIndicators = document.getElementById('trim-indicators');
+        const trimDownloadBtn = document.getElementById('trim-download-btn');
+        const selectionHighlight = document.getElementById('selection-highlight');
+        const playheadMarker = document.getElementById('playhead-marker');
+        const timelineContainer = document.getElementById('timeline-container');
+
+        // --- Utility Functions ---
+        /** Formats time in seconds to HH:MM:SS.mmm format. */
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds < 0) return '00:00.000';
+            const totalMilliseconds = Math.floor(seconds * 1000);
+            const ms = String(totalMilliseconds % 1000).padStart(3, '0');
+            const totalSeconds = Math.floor(totalMilliseconds / 1000);
+            const s = String(totalSeconds % 60).padStart(2, '0');
+            const m = String(Math.floor(totalSeconds / 60) % 60).padStart(2, '0');
+            const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+
+            if (h === '00') {
+                return `${m}:${s}.${ms}`;
+            }
+            return `${h}:${m}:${s}.${ms}`;
+        }
+
+        /** Shows a custom modal message. */
+        function showMessage(text) {
+            document.getElementById('message-text').textContent = text;
+            document.getElementById('message-box').classList.remove('hidden');
+            document.getElementById('message-box').classList.add('flex');
+        }
+
+        /** Converts a slider percentage value back to audio seconds. */
+        function percentToTime(percent) {
+            return (percent / 100) * totalDuration;
+        }
+
+        /** Converts audio seconds to a slider percentage value. */
+        function timeToPercent(time) {
+            if (totalDuration === 0) return 0;
+            return (time / totalDuration) * 100;
+        }
+
+        // --- Playback and Timeline Logic ---
+        function updateTimelineVisuals() {
+            // Update highlighted section (Trim Selection)
+            const left = startVal;
+            const width = endVal - startVal;
+            selectionHighlight.style.left = `${left}%`;
+            selectionHighlight.style.width = `${width}%`;
+
+            // Position the custom handles
+            startHandle.style.left = `${startVal}%`;
+            endHandle.style.left = `${endVal}%`;
+
+            // Update time displays
+            const startTime = percentToTime(startVal);
+            const endTime = percentToTime(endVal);
+            const trimLength = endTime - startTime;
+            startTimeDisplay.textContent = formatTime(startTime);
+            endTimeDisplay.textContent = formatTime(endTime);
+            trimLengthDisplay.textContent = formatTime(trimLength);
+
+            // Update current time visual marker (Playhead)
+            const currentPercent = timeToPercent(currentPlaybackTime);
+            playheadMarker.style.left = `${currentPercent}%`;
+        }
+
+        function updatePlaybackTime() {
+            if (!isPlaying || !audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            // Recalculate current playback time based on context time and start time offset
+            currentPlaybackTime = now - playStartTime;
+
+            // Check if playback reached the trim end point
+            const endTime = percentToTime(endVal);
+            if (currentPlaybackTime >= endTime) {
+                pausePlayback();
+                currentPlaybackTime = endTime; // Set to exact end point
+            }
+
+            // Check if we are past the total duration (safeguard)
+            if (currentPlaybackTime >= totalDuration) {
+                pausePlayback();
+                currentPlaybackTime = 0;
+            }
+
+            currentTimeDisplay.textContent = formatTime(currentPlaybackTime);
+            updateTimelineVisuals();
+
+            if (isPlaying) {
+                animationFrameId = requestAnimationFrame(updatePlaybackTime);
+            }
+        }
+
+        function playPlayback() {
+            if (!audioBuffer) return;
+
+            // Stop any existing playback
+            if (currentAudioSource) {
+                currentAudioSource.stop();
+            }
+
+            const start = percentToTime(startVal);
+            const end = percentToTime(endVal);
+            const totalDurationToPlay = end - start;
+
+            // Ensure current playback time is within the start/end range before starting
+            if (currentPlaybackTime < start || currentPlaybackTime >= end) {
+                currentPlaybackTime = start;
+            }
+
+            currentAudioSource = audioCtx.createBufferSource();
+            currentAudioSource.buffer = audioBuffer;
+            currentAudioSource.connect(audioCtx.destination);
+
+            // Calculate offset (how much into the buffer to start) and duration (how much to play)
+            const startOffset = currentPlaybackTime;
+            const playDuration = totalDurationToPlay - (currentPlaybackTime - start);
+
+            // Start the audio from the current position (currentPlaybackTime offset)
+            currentAudioSource.start(0, startOffset, playDuration);
+            playStartTime = audioCtx.currentTime - currentPlaybackTime;
+            isPlaying = true;
+
+            playIcon.classList.add('hidden');
+            pauseIcon.classList.remove('hidden');
+
+            // Start animation loop for timeline update
+            animationFrameId = requestAnimationFrame(updatePlaybackTime);
+        }
+
+        function pausePlayback() {
+            if (!isPlaying) return;
+            if (currentAudioSource) {
+                // Disconnect and stop the source to prevent memory leaks and ensure immediate stop
+                currentAudioSource.stop();
+                currentAudioSource.disconnect();
+                currentAudioSource = null;
+            }
+            isPlaying = false;
+            cancelAnimationFrame(animationFrameId);
+
+            playIcon.classList.remove('hidden');
+            pauseIcon.classList.add('hidden');
+        }
+
+        function togglePlayback() {
+            if (!audioBuffer) {
+                showMessage('Please load an audio file first.');
+                return;
+            }
+            if (isPlaying) {
+                pausePlayback();
+            } else {
+                playPlayback();
+            }
+        }
+
+        // --- Dragging Logic for Custom Handles ---
+
+        /** Updates the handle position based on mouse X position */
+        function updateHandlePosition(clientX) {
+            if (!audioBuffer || !activeDragHandle) return;
+
+            const rect = timelineContainer.getBoundingClientRect();
+            let x = clientX - rect.left;
+
+            // Calculate percentage (0 to 100)
+            let percent = (x / rect.width) * 100;
+            percent = Math.max(0, Math.min(percent, 100)); // Clamp 0-100
+
+            let newStartVal = startVal;
+            let newEndVal = endVal;
+
+            if (activeDragHandle === 'start') {
+                // Start handle cannot pass end handle
+                newStartVal = Math.min(percent, endVal);
+                // Ensure a minimum 0.01% gap
+                if (newEndVal - newStartVal < 0.01) {
+                    newStartVal = newEndVal - 0.01;
+                }
+            } else if (activeDragHandle === 'end') {
+                // End handle cannot go before start handle
+                newEndVal = Math.max(percent, startVal);
+                if (newEndVal - newStartVal < 0.01) {
+                    newEndVal = newStartVal + 0.01;
+                }
+            }
+
+            // Update global state and clamp
+            startVal = Math.max(0, Math.min(newStartVal, newEndVal));
+            endVal = Math.max(startVal, Math.min(newEndVal, 100));
+
+            // Snap playhead to boundaries and pause if necessary
+            const newStartTime = percentToTime(startVal);
+            const newEndTime = percentToTime(endVal);
+
+            // --- MODIFIED LOGIC HERE: Snap playhead to start handle during drag ---
+            if (activeDragHandle === 'start') {
+                // If dragging the start handle, the playhead MUST follow its new position.
+                currentPlaybackTime = newStartTime;
+            } else if (currentPlaybackTime < newStartTime) {
+                // If dragging the end handle or not dragging, only snap if playhead is outside the new start boundary.
+                currentPlaybackTime = newStartTime;
+            }
+            // ---------------------------------------------------------------------
+
+            if (currentPlaybackTime > newEndTime) {
+                currentPlaybackTime = newEndTime;
+                if (isPlaying) pausePlayback();
+            }
+
+            currentTimeDisplay.textContent = formatTime(currentPlaybackTime);
+            updateTimelineVisuals();
+
+            // Pause playback while dragging
+            if (isPlaying) {
+                pausePlayback();
+            }
+        }
+
+        function startDrag(e) {
+            e.preventDefault();
+            if (e.target === startHandle) {
+                activeDragHandle = 'start';
+            } else if (e.target === endHandle) {
+                activeDragHandle = 'end';
+            } else {
+                return;
+            }
+            updateHandlePosition(e.clientX);
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('mouseup', dragEnd);
+            document.body.style.cursor = 'grabbing';
+        }
+
+        function dragMove(e) {
+            if (activeDragHandle) {
+                updateHandlePosition(e.clientX);
+            }
+        }
+
+        function dragEnd() {
+            activeDragHandle = null;
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+            document.body.style.cursor = 'default';
+        }
+
+        /** Handles the mouse event to update the playhead position (scrubbing) */
+        function updatePlayheadPosition(e) {
+            if (!audioBuffer) return;
+
+            // Only allow scrubbing if not currently dragging a trim handle
+            if (activeDragHandle) return;
+
+            const rect = timelineContainer.getBoundingClientRect();
+            // Calculate mouse X position relative to the container
+            let x = e.clientX - rect.left;
+
+            // Clamp x position within the container bounds
+            x = Math.max(0, Math.min(x, rect.width));
+            const percent = (x / rect.width) * 100;
+            let newTime = percentToTime(percent);
+
+            const start = percentToTime(startVal);
+            const end = percentToTime(endVal);
+
+            // Clamp new time to be within the trimmed range (important for intuitive seeking)
+            newTime = Math.max(start, Math.min(newTime, end));
+            currentPlaybackTime = newTime;
+
+            currentTimeDisplay.textContent = formatTime(currentPlaybackTime);
+            updateTimelineVisuals(); // Updates the visual marker
+
+            // If audio is playing, pause it, as the user is manually seeking
+            if (isPlaying) {
+                pausePlayback();
+            }
+        }
+
+        // --- File Handling and Decoding ---
+        /** Loads and decodes the audio file. */
+        async function loadAudio(file) {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (audioCtx.state === 'suspended') {
+                try {
+                    await audioCtx.resume();
+                } catch (e) {
+                    console.error("Failed to resume AudioContext:", e);
+                    showMessage("Could not initialize audio. Please interact with the page and try again.");
+                    return;
+                }
+            }
+
+            const arrayBuffer = await file.arrayBuffer();
+            try {
+                // Stop and reset existing state
+                pausePlayback();
+                audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+                totalDuration = audioBuffer.duration;
+                currentPlaybackTime = 0;
+                startVal = 0;
+                endVal = 100;
+
+                // Update UI elements
+                totalDurationDisplay.textContent = formatTime(totalDuration);
+                currentTimeDisplay.textContent = formatTime(0);
+                fileInfo.textContent = `File loaded: ${file.name} (${formatTime(totalDuration)})`;
+                fileInfo.classList.remove('hidden');
+                trimmerSection.classList.remove('hidden');
+                timelineContainer.classList.remove('hidden');
+                trimIndicators.classList.remove('hidden');
+
+                // Initialize display
+                updateTimelineVisuals();
+
+            } catch (e) {
+                console.error('Error decoding audio data:', e);
+                showMessage('Failed to load or decode audio file. It might be an unsupported format.');
+                trimmerSection.classList.add('hidden');
+                timelineContainer.classList.add('hidden');
+                trimIndicators.classList.add('hidden');
+            }
+        }
+
+        /** Handles the file input change event. */
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                loadAudio(file);
+            }
+        }
+
+        /** Handles drag and drop file events. */
+        function handleDrop(e) {
+            e.preventDefault();
+            dropArea.classList.remove('border-emerald-400', 'bg-gray-700/50');
+            dropArea.classList.add('border-gray-600');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('audio/')) {
+                loadAudio(file);
+            } else {
+                showMessage('Please drop a valid audio file.');
+            }
+        }
+
+        // --- Audio Trimming and Download Logic (WAV Export) ---
+        /** Generates a WAV file header. */
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        /** Encodes the trimmed AudioBuffer into a WAV blob. */
+        function encodeWAV(audioBuffer, start, end) {
+            const sampleRate = audioBuffer.sampleRate;
+            const numChannels = audioBuffer.numberOfChannels;
+
+            // Calculate trim start and end frame indexes
+            const startFrame = Math.floor(start * sampleRate);
+            const endFrame = Math.floor(end * sampleRate);
+            const trimmedFrames = endFrame - startFrame;
+
+            if (trimmedFrames <= 0) {
+                showMessage("Trim length is zero or negative. Adjust your start and end points.");
+                return null;
+            }
+
+            // 44 bytes for the header, plus the data size
+            const buffer = new ArrayBuffer(44 + trimmedFrames * numChannels * 2);
+            const view = new DataView(buffer);
+            let offset = 0;
+
+            // RIFF chunk descriptor
+            writeString(view, offset, 'RIFF'); offset += 4;
+            view.setUint32(offset, 36 + trimmedFrames * numChannels * 2, true); offset += 4; // Chunk size
+            writeString(view, offset, 'WAVE'); offset += 4;
+
+            // FMT sub-chunk
+            writeString(view, offset, 'fmt '); offset += 4;
+            view.setUint32(offset, 16, true); offset += 4; // Sub-chunk size (16 for PCM)
+            view.setUint16(offset, 1, true); offset += 2; // Audio format (1 for PCM)
+            view.setUint16(offset, numChannels, true); offset += 2; // Number of channels
+            view.setUint32(offset, sampleRate, true); offset += 4; // Sample rate
+            view.setUint32(offset, sampleRate * numChannels * 2, true); offset += 4; // Byte rate (SampleRate * NumChannels * 2)
+            view.setUint16(offset, numChannels * 2, true); offset += 2; // Block align (NumChannels * 2)
+            view.setUint16(offset, 16, true); offset += 2; // Bits per sample (16)
+
+            // DATA sub-chunk
+            writeString(view, offset, 'data'); offset += 4;
+            view.setUint32(offset, trimmedFrames * numChannels * 2, true); offset += 4; // Data size
+
+            // Write PCM data (16-bit signed integer)
+            for (let j = startFrame; j < endFrame; j++) {
+                for (let i = 0; i < numChannels; i++) {
+                    const channelData = audioBuffer.getChannelData(i);
+                    // Convert float [-1, 1] to Int16 [-32768, 32767]
+                    let sample = channelData[j];
+                    sample = Math.max(-1, Math.min(1, sample)); // Clamp values
+                    sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                    view.setInt16(offset, sample, true);
+                    offset += 2;
+                }
+            }
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        function trimAndDownload() {
+            if (!audioBuffer) {
+                showMessage('Please load an audio file first.');
+                return;
+            }
+            pausePlayback();
+
+            const start = percentToTime(startVal);
+            const end = percentToTime(endVal);
+
+            if (end <= start) {
+                showMessage('Error: End time must be greater than start time.');
+                return;
+            }
+
+            // 1. Encode the trimmed audio to a WAV Blob
+            const audioBlob = encodeWAV(audioBuffer, start, end);
+            if (!audioBlob) return; // Error handled inside encodeWAV
+
+            // 2. Create a download link and trigger download
+            const url = URL.createObjectURL(audioBlob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `trimmed_audio_${Math.floor(Date.now() / 1000)}.wav`;
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            showMessage(`Successfully trimmed audio from ${formatTime(start)} to ${formatTime(end)} and started download.`);
+        }
+
+        // --- Initialization and Event Listeners ---
+        function setupEventListeners() {
+            // File input listener
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Drag and Drop listeners
+            dropArea.addEventListener('click', () => fileInput.click());
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.classList.add('border-emerald-400', 'bg-gray-700/50');
+                dropArea.classList.remove('border-gray-600');
+            });
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.classList.remove('border-emerald-400', 'bg-gray-700/50');
+                dropArea.classList.add('border-gray-600');
+            });
+            dropArea.addEventListener('drop', handleDrop);
+
+            // Playback control
+            playPauseBtn.addEventListener('click', togglePlayback);
+
+            // Download button
+            trimDownloadBtn.addEventListener('click', trimAndDownload);
+
+            // Message box close
+            document.getElementById('message-close-btn').addEventListener('click', () => {
+                document.getElementById('message-box').classList.remove('flex');
+                document.getElementById('message-box').classList.add('hidden');
+            });
+
+            // --- Custom Draggable Handle Listeners ---
+            startHandle.addEventListener('mousedown', startDrag);
+            endHandle.addEventListener('mousedown', startDrag);
+
+            // --- Scrubbing/Seeking Logic ---
+            timelineContainer.addEventListener('mousedown', (e) => {
+                // Check if the click target is NOT one of the draggable handles
+                if (e.target.classList.contains('trim-handle') || activeDragHandle) {
+                    return;
+                }
+                isScrubbing = true;
+                updatePlayheadPosition(e);
+            });
+
+            // Use document for mousemove/mouseup to handle dragging outside the container
+            document.addEventListener('mousemove', (e) => {
+                if (isScrubbing && !activeDragHandle) {
+                    e.preventDefault(); // Prevent text selection
+                    updatePlayheadPosition(e);
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isScrubbing = false;
+            });
+        }
+
+        // Ensure the context is ready on first user interaction if it was suspended
+        document.addEventListener('click', async () => {
+             if (audioCtx && audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+             }
+        });
+
+        window.onload = setupEventListeners;
+    </script>
+</body>
+</html>
