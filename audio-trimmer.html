@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free online audio trimmer tool. Trim audio files with precision, cut unwanted parts from MP3, WAV, and other formats. Export as WAV. No sign up required. Secure client-side processing.">
+    <meta name="description" content="Free online audio trimmer tool. Trim audio files with precision, cut unwanted parts from MP3, WAV, and other formats. Export as WAV or MP3. No sign up required. Secure client-side processing.">
     <meta name="keywords" content="free audio trimmer online, trim audio online, cut audio files, MP3 trimmer, WAV trimmer, audio editor online, no sign up, free online tools, vc engine, VCENGINE, online audio tools">
     <meta name="author" content="vc engine">
     <meta name="robots" content="index, follow">
@@ -14,9 +14,10 @@
     <meta name="googlebot" content="index, follow">
     <title>Audio Trimmer Tool - Free Online Audio Trimming | No Sign Up</title>
     <!-- Load Tailwind CSS -->
-     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1349217207880778"
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1349217207880778"
      crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lamejs@1.2.0/lame.min.js"></script>
     <style>
         /* Custom font for time displays */
         .font-mono {
@@ -107,7 +108,7 @@
 </head>
 <body class="bg-gray-900 text-white font-sans min-h-screen p-4 md:p-8 flex items-center justify-center">
     <div id="app" class="w-full max-w-4xl bg-gray-800 p-6 md:p-10 rounded-xl shadow-2xl space-y-8">
-        <h1 class="text-3xl font-extrabold text-emerald-400 border-b border-gray-700 pb-3">Audio Trimmer Tool <span class="text-sm font-normal text-gray-400">(WAV Export)</span></h1>
+        <h1 class="text-3xl font-extrabold text-emerald-400 border-b border-gray-700 pb-3">Audio Trimmer Tool <span class="text-sm font-normal text-gray-400">(WAV/MP3 Export)</span></h1>
 
         <!-- File Upload Area (Refined Cloud Widget) -->
         <div id="upload-section" class="space-y-4">
@@ -175,9 +176,18 @@
                 </div>
             </div>
 
+            <!-- Format Selection -->
+            <div class="flex items-center justify-center space-x-4 mb-4">
+                <label class="text-gray-300 font-medium">Export Format:</label>
+                <select id="format-select" class="bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                    <option value="wav">WAV</option>
+                    <option value="mp3">MP3</option>
+                </select>
+            </div>
+
             <!-- Download Button -->
             <button id="trim-download-btn" class="w-full py-4 bg-yellow-500 text-gray-900 font-extrabold text-lg rounded-xl shadow-lg hover:bg-yellow-400 transition transform hover:scale-[1.005] active:scale-100 shadow-yellow-500/40">
-                Trim & Download WAV File
+                Trim & Download
             </button>
         </div>
 
@@ -231,6 +241,7 @@
         const selectionHighlight = document.getElementById('selection-highlight');
         const playheadMarker = document.getElementById('playhead-marker');
         const timelineContainer = document.getElementById('timeline-container');
+        const formatSelect = document.getElementById('format-select');
 
         // --- Utility Functions ---
         /** Formats time in seconds to HH:MM:SS.mmm format. */
@@ -456,22 +467,29 @@
             } else {
                 return;
             }
-            updateHandlePosition(e.clientX);
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            updateHandlePosition(clientX);
             document.addEventListener('mousemove', dragMove);
+            document.addEventListener('touchmove', dragMove, { passive: false });
             document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchend', dragEnd);
             document.body.style.cursor = 'grabbing';
         }
 
         function dragMove(e) {
             if (activeDragHandle) {
-                updateHandlePosition(e.clientX);
+                e.preventDefault();
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                updateHandlePosition(clientX);
             }
         }
 
         function dragEnd() {
             activeDragHandle = null;
             document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('touchmove', dragMove);
             document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchend', dragEnd);
             document.body.style.cursor = 'default';
         }
 
@@ -639,6 +657,109 @@
             return new Blob([view], { type: 'audio/wav' });
         }
 
+        /** Encodes the trimmed AudioBuffer into an MP3 blob using lamejs. */
+        function encodeMP3(audioBuffer, start, end) {
+            const sampleRate = audioBuffer.sampleRate;
+            const numChannels = audioBuffer.numberOfChannels;
+
+            // Calculate trim start and end frame indexes
+            const startFrame = Math.floor(start * sampleRate);
+            const endFrame = Math.floor(end * sampleRate);
+            const trimmedFrames = endFrame - startFrame;
+
+            if (trimmedFrames <= 0) {
+                showMessage("Trim length is zero or negative. Adjust your start and end points.");
+                return null;
+            }
+
+            // Initialize lamejs encoder
+            const mp3encoder = new lamejs.Mp3Encoder(numChannels, sampleRate, 128); // 128 kbps bitrate
+            const mp3Data = [];
+
+            // Process in chunks to avoid memory issues
+            const chunkSize = 1152; // MP3 frame size
+            for (let i = startFrame; i < endFrame; i += chunkSize) {
+                const endChunk = Math.min(i + chunkSize, endFrame);
+                const left = [];
+                const right = numChannels > 1 ? [] : null;
+
+                for (let j = i; j < endChunk; j++) {
+                    const sampleL = Math.max(-1, Math.min(1, audioBuffer.getChannelData(0)[j])) * 32767.5;
+                    left.push(sampleL);
+                    if (right) {
+                        const sampleR = Math.max(-1, Math.min(1, audioBuffer.getChannelData(1)[j])) * 32767.5;
+                        right.push(sampleR);
+                    }
+                }
+
+                const mp3buf = mp3encoder.encodeBuffer(left, right);
+                if (mp3buf.length > 0) {
+                    mp3Data.push(mp3buf);
+                }
+            }
+
+            const mp3buf = mp3encoder.flush();
+            if (mp3buf.length > 0) {
+                mp3Data.push(mp3buf);
+            }
+
+            return new Blob(mp3Data, { type: 'audio/mp3' });
+        }
+
+        /** Encodes the trimmed AudioBuffer into an OGG blob using vorbis-encoder-js. */
+        function encodeOGG(audioBuffer, start, end) {
+            const sampleRate = audioBuffer.sampleRate;
+            const numChannels = audioBuffer.numberOfChannels;
+
+            // Calculate trim start and end frame indexes
+            const startFrame = Math.floor(start * sampleRate);
+            const endFrame = Math.floor(end * sampleRate);
+            const trimmedFrames = endFrame - startFrame;
+
+            if (trimmedFrames <= 0) {
+                showMessage("Trim length is zero or negative. Adjust your start and end points.");
+                return null;
+            }
+
+            try {
+                // Initialize Vorbis encoder
+                const encoder = new VorbisEncoder(sampleRate, numChannels, 0.5); // quality 0.5
+                const oggData = [];
+
+                // Process in larger chunks to avoid memory issues and encoder limits
+                const chunkSize = 44100; // 1 second chunks at 44.1kHz
+                for (let i = startFrame; i < endFrame; i += chunkSize) {
+                    const endChunk = Math.min(i + chunkSize, endFrame);
+                    const chunkLength = endChunk - i;
+                    const left = [];
+                    const right = numChannels > 1 ? [] : null;
+
+                    for (let j = 0; j < chunkLength; j++) {
+                        left.push(audioBuffer.getChannelData(0)[i + j]);
+                        if (right) {
+                            right.push(audioBuffer.getChannelData(1)[i + j]);
+                        }
+                    }
+
+                    const oggbuf = encoder.encode(left, right);
+                    if (oggbuf.length > 0) {
+                        oggData.push(oggbuf);
+                    }
+                }
+
+                const finalOgg = encoder.finish();
+                if (finalOgg.length > 0) {
+                    oggData.push(finalOgg);
+                }
+
+                return new Blob(oggData, { type: 'audio/ogg' });
+            } catch (error) {
+                console.error('Error encoding OGG:', error);
+                showMessage('Failed to encode audio as OGG. Please try a different format.');
+                return null;
+            }
+        }
+
         function trimAndDownload() {
             if (!audioBuffer) {
                 showMessage('Please load an audio file first.');
@@ -654,23 +775,36 @@
                 return;
             }
 
-            // 1. Encode the trimmed audio to a WAV Blob
-            const audioBlob = encodeWAV(audioBuffer, start, end);
-            if (!audioBlob) return; // Error handled inside encodeWAV
+            const format = formatSelect.value;
+            let audioBlob;
+            let extension;
+
+            if (format === 'wav') {
+                audioBlob = encodeWAV(audioBuffer, start, end);
+                extension = 'wav';
+            } else if (format === 'mp3') {
+                audioBlob = encodeMP3(audioBuffer, start, end);
+                extension = 'mp3';
+            } else if (format === 'ogg') {
+                audioBlob = encodeOGG(audioBuffer, start, end);
+                extension = 'ogg';
+            }
+
+            if (!audioBlob) return; // Error handled inside encode functions
 
             // 2. Create a download link and trigger download
             const url = URL.createObjectURL(audioBlob);
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
-            a.download = `trimmed_audio_${Math.floor(Date.now() / 1000)}.wav`;
+            a.download = `trimmed_audio_${Math.floor(Date.now() / 1000)}.${extension}`;
             document.body.appendChild(a);
             a.click();
 
             // Clean up
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
-            showMessage(`Successfully trimmed audio from ${formatTime(start)} to ${formatTime(end)} and started download.`);
+            showMessage(`Successfully trimmed audio from ${formatTime(start)} to ${formatTime(end)} and started download as ${extension.toUpperCase()}.`);
         }
 
         // --- Initialization and Event Listeners ---
