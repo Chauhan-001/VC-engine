@@ -26,6 +26,7 @@
     <title>VCENGINE - Free Online Video Creation Tools | No Sign Up Required</title>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1349217207880778"
      crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
             margin: 0;
@@ -56,7 +57,8 @@
         .logo {
             width: 100px;
             height: auto;
-            margin-bottom: 10px;
+            margin: 0 auto 10px;
+            display: block;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
@@ -190,12 +192,13 @@
             display: inline-block;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 12px 30px;
+            padding: 16px 30px; /* Increased padding for 44px min height */
             border-radius: 50px;
             text-decoration: none;
             font-weight: 500;
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            min-height: 44px; /* Ensure minimum touch target */
         }
 
         .tool-link:hover {
@@ -216,17 +219,69 @@
             }
         }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-            .tools-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            .tool-card {
-                padding: 20px;
-            }
+        /* Responsive classes using Tailwind */
+        .container {
+            @apply px-4 sm:px-6 md:px-8 lg:px-20;
+        }
+
+        header {
+            @apply py-12 sm:py-16 md:py-20;
+        }
+
+        .logo {
+            @apply w-20 sm:w-24 md:w-28;
+        }
+
+        h1 {
+            @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl;
+        }
+
+        .subtitle {
+            @apply text-lg sm:text-xl md:text-2xl;
+        }
+
+        .search-input {
+            @apply max-w-xs sm:max-w-sm md:max-w-md px-4 py-3 text-sm sm:text-base;
+        }
+
+        .tools-grid {
+            @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8;
+        }
+
+        .tool-card {
+            @apply p-6 sm:p-8;
+        }
+
+        .tool-icon {
+            @apply text-6xl sm:text-7xl md:text-8xl;
+        }
+
+        .tool-title {
+            @apply text-lg sm:text-xl md:text-2xl;
+        }
+
+        .tool-description {
+            @apply text-sm sm:text-base;
+        }
+
+        .tool-link {
+            @apply px-6 py-4 text-sm sm:text-base;
+        }
+
+        .ad-container {
+            @apply mx-4 sm:mx-8 md:mx-12 my-8 sm:my-12 md:my-16 min-h-20 sm:min-h-24;
+        }
+
+        .about-section {
+            @apply p-6 sm:p-8 md:p-12 mt-12 sm:mt-16 md:mt-20;
+        }
+
+        .about-section h2 {
+            @apply text-xl sm:text-2xl md:text-3xl;
+        }
+
+        .about-section p {
+            @apply text-sm sm:text-base md:text-lg;
         }
 
         .floating-shapes {
@@ -298,8 +353,8 @@
 
     <div class="container">
         <header>
-            <img src="Gemini_Generated_Image_sqvv8lsqvv8lsqvv.png" alt="VC Engine Logo" class="logo" id="logo">
             <h1>VC Engine</h1>
+            <img src="Gemini_Generated_Image_sqvv8lsqvv8lsqvv.png" alt="VC Engine Logo" class="logo" id="logo">
             <p class="subtitle">Powerful Video Creation and Media Processing Tools</p>
             <div class="search-container">
                 <input type="text" class="search-input" id="searchInput" placeholder="Search tools...">
@@ -385,17 +440,19 @@
             </div>
         </div>
 
-        <div class="about-section" style="margin-top: 60px; padding: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; text-align: center; color: white;">
-            <h2 style="font-size: 2rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">About VC Engine</h2>
-            <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;">
+        <div class="about-section bg-white/10 rounded-3xl text-center text-white mt-12 sm:mt-16 md:mt-20 p-6 sm:p-8 md:p-10 lg:p-12">
+            <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-4 sm:mb-6 text-shadow">About VC Engine</h2>
+            <p class="text-sm sm:text-base md:text-lg leading-relaxed mb-4 sm:mb-6">
                 VC Engine is your go-to platform for free online tools that make video creation, media editing, and document processing simple and accessible. Whether you're merging photos with audio to create stunning videos, extracting sound from clips, editing PDFs, designing professional resumes, or optimizing images, our tools are designed to help you get the job done quickly and easily.
             </p>
-            <h1>VC Engine – Free Online Media & Document Tools</h1>
-<p>VC Engine offers a powerful suite of free tools to simplify your digital workflow. Merge PDFs, compress images, create resumes, extract audio, and generate videos — all in your browser, no downloads required. Fast, secure, and easy to use.</p>
-            <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;">
+            <h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-4">VC Engine – Free Online Media & Document Tools</h1>
+            <p class="text-sm sm:text-base md:text-lg leading-relaxed mb-4 sm:mb-6">
+                VC Engine offers a powerful suite of free tools to simplify your digital workflow. Merge PDFs, compress images, create resumes, extract audio, and generate videos — all in your browser, no downloads required. Fast, secure, and easy to use.
+            </p>
+            <p class="text-sm sm:text-base md:text-lg leading-relaxed mb-4 sm:mb-6">
                 All our tools are completely free to use with no sign-up required. You can start using them right away without creating an account or providing any personal information. We believe in keeping things straightforward and user-friendly.
             </p>
-            <p style="font-size: 1.1rem; line-height: 1.6;">
+            <p class="text-sm sm:text-base md:text-lg leading-relaxed">
                 Your privacy and data security are our top priorities. All processing happens directly in your browser, meaning your files are never uploaded to our servers. We don't store, share, or access your data in any way. Your content remains private and secure on your device at all times.
             </p>
         </div>

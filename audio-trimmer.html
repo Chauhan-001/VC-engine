@@ -30,6 +30,7 @@
             height: 40px; /* Increased height for the custom handles */
             margin-top: 1.5rem; /* More vertical breathing room */
             margin-bottom: 0.5rem;
+            touch-action: none; /* Prevent scrolling on touch devices */
         }
 
         /* The base track that represents the full audio duration */
@@ -74,13 +75,15 @@
         .trim-handle {
             position: absolute;
             top: 50%;
-            height: 40px; /* Tall for easy click/touch */
-            width: 16px;  /* Wide for easy click/touch */
+            height: 44px; /* Increased to 44px for touch accessibility */
+            width: 44px;  /* Increased to 44px for touch accessibility */
             cursor: grab;
             transform: translate(-50%, -50%); /* Center based on left position */
             z-index: 5; /* Ensure they are above everything */
             border: 1px solid #111827;
             transition: box-shadow 0.1s, transform 0.1s;
+            min-width: 44px; /* Ensure minimum touch target */
+            min-height: 44px; /* Ensure minimum touch target */
         }
 
         .trim-handle:hover {
@@ -839,7 +842,9 @@
 
             // --- Custom Draggable Handle Listeners ---
             startHandle.addEventListener('mousedown', startDrag);
+            startHandle.addEventListener('touchstart', startDrag, { passive: false });
             endHandle.addEventListener('mousedown', startDrag);
+            endHandle.addEventListener('touchstart', startDrag, { passive: false });
 
             // --- Scrubbing/Seeking Logic ---
             timelineContainer.addEventListener('mousedown', (e) => {
@@ -850,6 +855,13 @@
                 isScrubbing = true;
                 updatePlayheadPosition(e);
             });
+            timelineContainer.addEventListener('touchstart', (e) => {
+                if (e.target.classList.contains('trim-handle') || activeDragHandle) {
+                    return;
+                }
+                isScrubbing = true;
+                updatePlayheadPosition(e);
+            }, { passive: false });
 
             // Use document for mousemove/mouseup to handle dragging outside the container
             document.addEventListener('mousemove', (e) => {
@@ -858,8 +870,17 @@
                     updatePlayheadPosition(e);
                 }
             });
+            document.addEventListener('touchmove', (e) => {
+                if (isScrubbing && !activeDragHandle) {
+                    e.preventDefault();
+                    updatePlayheadPosition(e);
+                }
+            }, { passive: false });
 
             document.addEventListener('mouseup', () => {
+                isScrubbing = false;
+            });
+            document.addEventListener('touchend', () => {
                 isScrubbing = false;
             });
         }
