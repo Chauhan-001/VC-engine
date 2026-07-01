@@ -107,7 +107,8 @@ function Footer() {
 
             <div className="flex flex-col gap-3">
               <Link
-                to="/privacy"
+                to="/privacy-policy"
+
                 className="
                   font-mono
                   text-sm
@@ -121,7 +122,8 @@ function Footer() {
               </Link>
 
               <Link
-                to="/terms"
+                to="/terms-of-service"
+
                 className="
                   font-mono
                   text-sm

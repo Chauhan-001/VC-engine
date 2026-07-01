@@ -1,0 +1,17 @@
+export const CORE_URL = "/ffmpeg/ffmpeg-core.js";
+export const FFMessageType = {
+  LOAD: "LOAD",
+  EXEC: "EXEC",
+  WRITE_FILE: "WRITE_FILE",
+  READ_FILE: "READ_FILE",
+  DELETE_FILE: "DELETE_FILE",
+  RENAME: "RENAME",
+  CREATE_DIR: "CREATE_DIR",
+  LIST_DIR: "LIST_DIR",
+  DELETE_DIR: "DELETE_DIR",
+  MOUNT: "MOUNT",
+  UNMOUNT: "UNMOUNT",
+  ERROR: "ERROR",
+  LOG: "LOG",
+  PROGRESS: "PROGRESS",
+};

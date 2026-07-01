@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+
+
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
@@ -8,35 +10,31 @@ import Navbar from "../../components/common/Navbar";
 import Footer from "../../components/common/Footer";
 import UploadZone from "../../components/common/UploadZone";
 
-import PdfThumbnailGrid from "../../components/pdf/PdfThumbnailGrid";
+import PagePreviewGrid from "../../components/pdf/PagePreviewGrid";
+import SinglePagePreviewModal from "../../components/pdf/SinglePagePreviewModal";
 import MultiRangeInput from "../../components/pdf/MultiRangeInput";
 import SelectedPagesActions from "../../components/pdf/SelectedPagesActions";
 import SplitLoadingOverlay from "../../components/pdf/SplitLoadingOverlay";
 import SplitButton from "../../components/pdf/SplitButton";
-
 
 function SplitPdf() {
   const [toast, setToast] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
   const [pageCount, setPageCount] = useState(0);
 
-  const [selectedPages, setSelectedPages] = useState(() => new Set());
-  const [deletedPages, setDeletedPages] = useState(() => new Set());
+  const [selectedPages, setSelectedPages] = useState(() => new Set()); // originalPageNumber
+  const [pages, setPages] = useState([]); // [{ originalPageNumber, displayPageNumber }]
 
   const [ranges, setRanges] = useState([]); // {id, from, to}
 
-
   const [loading, setLoading] = useState(false);
 
-  const visiblePages = useMemo(() => {
-    if (!pageCount) return [];
-    // preview grid should support delete-from-preview
-    const pages = [];
-    for (let i = 1; i <= pageCount; i++) {
-      if (!deletedPages.has(i)) pages.push(i);
-    }
-    return pages;
-  }, [deletedPages, pageCount]);
+  const [previewOpenPage, setPreviewOpenPage] = useState(null); // originalPageNumber
+
+
+
+
+
 
   const canSplit = useMemo(() => {
     if (!pdfFile || pageCount <= 0) return false;
@@ -54,14 +52,15 @@ function SplitPdf() {
       if (r.from > r.to) return false;
     }
 
-    // overlap check
+    // overlap check (contiguous allowed => touching is OK)
     const sorted = normalized.slice().sort((a, b) => a.from - b.from);
     for (let i = 0; i < sorted.length - 1; i++) {
       if (sorted[i + 1].from <= sorted[i].to) return false;
     }
 
     return true;
-  }, [deletedPages, pageCount, pdfFile, ranges]);
+  }, [pageCount, pdfFile, ranges]);
+
 
 
   const pushToast = (type, message) => {
@@ -87,7 +86,12 @@ function SplitPdf() {
       const safeTo = Math.min(1, count);
       setRanges([{ id: "range-1", from: 1, to: safeTo }]);
       setSelectedPages(new Set());
-      setDeletedPages(new Set());
+      setPages(
+        Array.from({ length: count }, (_, i) => ({
+          originalPageNumber: i + 1,
+          displayPageNumber: i + 1,
+        }))
+      );
 
     } catch (e) {
       console.error(e);
@@ -110,7 +114,9 @@ function SplitPdf() {
     return new Blob([outBytes], { type: "application/pdf" });
   };
 
+  // (EXTRACT SELECTED removed per requirements)
   const extractSelectedPages = async (pdfBytes, pagesToExtract) => {
+
     const pdf = await PDFDocument.load(pdfBytes);
 
     const out = await PDFDocument.create();
@@ -262,48 +268,75 @@ function SplitPdf() {
                   Page Preview ({pageCount})
                 </h2>
                 <p className="mt-2 font-mono text-xs uppercase tracking-wider text-gray-400">
-                  Click thumbnails to select. Use X to remove from preview.
+                  Click a page card to preview. Select inside the preview. X removes from selection.
                 </p>
 
                 <div className="mt-6 relative">
-                  <PdfThumbnailGrid
-                    pdfFile={pdfFile}
-                    pageNumbers={visiblePages}
+
+                  <PagePreviewGrid
+                    pages={pages}
                     selectedPages={selectedPages}
-                    disabled={loading}
-                    onToggleSelect={(pageNumber) => {
+                    ranges={ranges}
+                    onClickPreview={(originalPageNumber) => {
+                      setPreviewOpenPage(originalPageNumber);
+                    }}
+                    onRemovePage={(originalPageNumber) => {
+                      setPages((prev) => {
+                        const next = prev.filter((p) => p.originalPageNumber !== originalPageNumber);
+                        return next.map((p, idx) => ({
+                          ...p,
+                          displayPageNumber: idx + 1,
+                        }));
+                      });
                       setSelectedPages((prev) => {
                         const next = new Set(prev);
-                        if (next.has(pageNumber)) next.delete(pageNumber);
-                        else next.add(pageNumber);
+                        next.delete(originalPageNumber);
+                        return next;
+                      });
+                      if (previewOpenPage === originalPageNumber) setPreviewOpenPage(null);
+                    }}
+                  />
+
+                  <SinglePagePreviewModal
+                    isOpen={previewOpenPage != null}
+                    onClose={() => setPreviewOpenPage(null)}
+                    pdfFile={pdfFile}
+                    pageNumber={previewOpenPage} // originalPageNumber (pdf.js render)
+                    displayPageNumber={
+                      previewOpenPage == null ? null : pages.find((p) => p.originalPageNumber === previewOpenPage)?.displayPageNumber ?? null
+                    }
+                    selected={previewOpenPage != null && selectedPages.has(previewOpenPage)}
+                    disabled={loading}
+                    onSelect={(originalPageNumber) => {
+                      setSelectedPages((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(originalPageNumber)) next.delete(originalPageNumber);
+                        else next.add(originalPageNumber);
                         return next;
                       });
                     }}
-                    onRemovePage={(pageNumber) => {
-                      setDeletedPages((prev) => {
-                        const next = new Set(prev);
-                        next.add(pageNumber);
-                        return next;
+                    onRemove={(originalPageNumber) => {
+                      setPages((prev) => {
+                        const next = prev.filter((p) => p.originalPageNumber !== originalPageNumber);
+                        return next.map((p, idx) => ({
+                          ...p,
+                          displayPageNumber: idx + 1,
+                        }));
                       });
                       setSelectedPages((prev) => {
                         const next = new Set(prev);
-                        next.delete(pageNumber);
+                        next.delete(originalPageNumber);
                         return next;
                       });
+                      setPreviewOpenPage(null);
                     }}
                   />
 
                   <SplitLoadingOverlay loading={loading && pageCount > 0} label="Generating previews" />
                 </div>
 
-                <div className="mt-6">
-                  <SelectedPagesActions
-                    selectedCount={selectedPages.size}
-                    onExtract={handleExtractSelected}
-                    disabled={!selectedPages.size}
-                    loading={loading}
-                  />
-                </div>
+
+
               </section>
 
               {/* Right: Options */}

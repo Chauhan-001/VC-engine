@@ -201,7 +201,8 @@ const [mousePos, setMousePos] = useState({
             sm:flex-row
           "
         >
-          <button
+          <a
+            href="#tools"
             className="
               border-[3px]
               border-black
@@ -221,9 +222,10 @@ const [mousePos, setMousePos] = useState({
             "
           >
             Explore Tools
-          </button>
+          </a>
 
-          <button
+          <a
+            href="/documentation"
             className="
               border-[3px]
               border-black
@@ -243,7 +245,7 @@ const [mousePos, setMousePos] = useState({
             "
           >
             How It Works
-          </button>
+          </a>
         </div>
 
         {/* Browser Preview */}

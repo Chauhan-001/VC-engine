@@ -11,72 +11,22 @@ export const toolCategories = [
     icon: pdfIcon,
     color: "#0066ff",
     featured: true,
-tools: [
-  {
-    name: "PDF Merger",
-    path: "/pdf/merge",
-  },
 
-  {
-    name: "PDF Splitter",
-    path: "/pdf/split",
-  },
-
-  {
-    name: "PDF Compressor",
-    path: "/pdf/compress",
-  },
-
-  {
-    name: "Delete Pages",
-    path: "/pdf/delete-pages",
-  },
-
-  {
-    name: "Extract Pages",
-    path: "/pdf/extract-pages",
-  },
-
-  {
-    name: "Reorder Pages",
-    path: "/pdf/reorder-pages",
-  },
-
-  {
-    name: "Page Numbers",
-    path: "/pdf/page-numbers",
-  },
-
-  {
-    name: "Add Watermark",
-    path: "/pdf/watermark",
-  },
-
-  {
-    name: "Protect PDF",
-    path: "/pdf/protect",
-  },
-
-  {
-    name: "Unlock PDF",
-    path: "/pdf/unlock",
-  },
-
-  {
-    name: "Metadata Editor",
-    path: "/pdf/metadata",
-  },
-
-  {
-    name: "Images to PDF",
-    path: "/pdf/images-to-pdf",
-  },
-
-  {
-    name: "PDF to Images",
-    path: "/pdf/pdf-to-images",
-  },
-]
+    tools: [
+      { name: "PDF Merger", path: "/pdf/merge" },
+      { name: "PDF Splitter", path: "/pdf/split" },
+      { name: "PDF Compressor", path: "/pdf/compress" },
+      { name: "Delete Pages", path: "/pdf/delete-pages" },
+      { name: "Extract Pages", path: "/pdf/extract-pages" },
+      { name: "Reorder Pages", path: "/pdf/reorder-pages" },
+      { name: "Page Numbers", path: "/pdf/page-numbers" },
+      { name: "Add Watermark", path: "/pdf/watermark" },
+      { name: "Protect PDF", path: "/pdf/protect" },
+      { name: "Unlock PDF", path: "/pdf/unlock" },
+      { name: "Metadata Editor", path: "/pdf/metadata" },
+      { name: "Images to PDF", path: "/pdf/images-to-pdf" },
+      { name: "PDF to Images", path: "/pdf/pdf-to-images" },
+    ],
   },
 
   {
@@ -87,19 +37,19 @@ tools: [
     featured: true,
 
     tools: [
-      "Audio Trimmer",
-      "Audio Merger",
-      "Audio Splitter",
-      "Volume Booster",
-      "Speed Changer",
-      "Pitch Changer",
-      "Reverse Audio",
-      "Fade In Audio",
-      "Fade Out Audio",
-      "MP3 to WAV",
-      "WAV to MP3",
-      "OGG to MP3",
-      "Audio Visualizer",
+      { name: "Audio Trimmer", path: "/audio/trim" },
+      { name: "Audio Merger", path: "/audio/merger" },
+      { name: "Audio Splitter", path: "/audio/splitter" },
+      { name: "Volume Booster", path: "/audio/volume-booster" },
+      { name: "Speed Changer", path: "/audio/speed-changer" },
+      { name: "Pitch Changer", path: "/audio/pitch-changer" },
+      { name: "Reverse Audio", path: "/audio/reverse" },
+      { name: "Fade In Audio", path: "/audio/fade-in" },
+      { name: "Fade Out Audio", path: "/audio/fade-out" },
+      { name: "MP3 to WAV", path: "/audio/mp3-to-wav" },
+      { name: "WAV to MP3", path: "/audio/wav-to-mp3" },
+      { name: "OGG to MP3", path: "/audio/ogg-to-mp3" },
+      
     ],
   },
 
@@ -109,13 +59,12 @@ tools: [
     color: "#ff4d4d",
 
     tools: [
-      "Image Compressor",
-      "Bulk Image Compressor",
-      "JPG to PNG",
-      "PNG to JPG",
-      "WEBP to PNG",
-      "PNG to WEBP",
-      "SVG to PNG",
+      { name: "Image Compressor", path: "/image/compress" },
+      { name: "JPG to PNG", path: "/image/jpg-to-png" },
+      { name: "PNG to JPG", path: "/image/png-to-jpg" },
+      { name: "WEBP to PNG", path: "/image/webp-to-png" },
+      { name: "PNG to WEBP", path: "/image/png-to-webp" },
+      { name: "SVG to PNG", path: "/image/svg-to-png" },
     ],
   },
 
@@ -125,10 +74,10 @@ tools: [
     color: "#0066ff",
 
     tools: [
-      "Video Compressor",
-      "Video to Audio",
-      "Video to GIF",
-      "Images to Video",
+      { name: "Video Compressor", path: "/video/compress" },
+      { name: "Video to Audio", path: "/video/to-audio" },
+      { name: "Video to GIF", path: "/video/to-gif" },
+      { name: "Images to Video", path: "/video/images-to-video" },
     ],
   },
 
@@ -138,10 +87,7 @@ tools: [
     color: "#3ECF8E",
 
     tools: [
-      "Resume Builder",
-      "Resume Templates",
-      "ATS Resume Checker",
-      "Cover Letter Builder",
+      { name: "Resume Builder", path: "/resume/builder" },
     ],
   },
 ];
