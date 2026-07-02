@@ -130,8 +130,9 @@ const [mousePos, setMousePos] = useState({
   className="
     block
     md:hidden
-    text-4xl
+    text-5xl
     font-black
+    tracking-tight
     uppercase
     leading-tight
     text-white
