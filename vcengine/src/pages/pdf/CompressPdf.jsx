@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { PDFDocument } from "pdf-lib";
 
 import Toast from "../../components/common/Toast";
 import Navbar from "../../components/common/Navbar";
@@ -10,7 +9,11 @@ import UploadZone from "../../components/common/UploadZone";
 
 import CompressionLevelCard from "../../components/pdf/CompressionLevelCard";
 import OutputEstimateCard from "../../components/pdf/OutputEstimateCard";
-import CompressButton from "../../components/pdf/CompressButton";
+
+async function getPdfLib() {
+  const mod = await import("pdf-lib");
+  return mod;
+}
 
 function formatBytes(bytes) {
   if (!Number.isFinite(bytes) || bytes < 0) return "0 B";
@@ -123,6 +126,7 @@ function CompressPdf() {
     // Note: Without specialized image/XObject re-encoding, the size reduction is
     // best-effort and depends on the source PDF structure. We still implement a true
     // client-side PDF rebuild.
+    const PDFDocument = await getPDFDocument();
     const srcPdf = await PDFDocument.load(pdfBytes);
 
     // Clone pages into a new doc (forces structural rebuild).

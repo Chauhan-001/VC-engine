@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { PDFDocument } from "pdf-lib";
 
 import Toast from "../../components/common/Toast";
 import Navbar from "../../components/common/Navbar";
@@ -38,86 +37,81 @@ function MergePdf() {
   };
 
   const handleMerge = async () => {
-  if (files.length < 2) {
-    alert("Please select at least 2 PDF files.");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    // Create an empty PDF
-    const mergedPdf = await PDFDocument.create();
-
-    // Process every uploaded PDF
-    for (const file of files) {
-      // Convert file to binary data
-      const arrayBuffer = await file.arrayBuffer();
-
-      // Load PDF
-      const pdf = await PDFDocument.load(arrayBuffer);
-
-      // Get all page indices
-      const pageIndices = pdf.getPageIndices();
-
-      // Copy pages into merged PDF
-      const copiedPages = await mergedPdf.copyPages(
-        pdf,
-        pageIndices
-      );
-
-      // Add pages
-      copiedPages.forEach((page) => {
-        mergedPdf.addPage(page);
-      });
+    if (files.length < 2) {
+      alert("Please select at least 2 PDF files.");
+      return;
     }
 
-    // Save merged PDF
-    const mergedBytes = await mergedPdf.save();
+    try {
+      setLoading(true);
 
-    // Create downloadable file
-    const blob = new Blob([mergedBytes], {
-      type: "application/pdf",
-    });
+      // Create an empty PDF
+      const { PDFDocument } = await import("pdf-lib");
+      const mergedPdf = await PDFDocument.create();
 
-    const url = URL.createObjectURL(blob);
+      // Process every uploaded PDF
+      for (const file of files) {
+        // Convert file to binary data
+        const arrayBuffer = await file.arrayBuffer();
 
-    const link = document.createElement("a");
+        // Load PDF
+        const pdf = await PDFDocument.load(arrayBuffer);
 
-    link.href = url;
-    link.download = "merged.pdf";
+        // Get all page indices
+        const pageIndices = pdf.getPageIndices();
 
-    document.body.appendChild(link);
+        // Copy pages into merged PDF
+        const copiedPages = await mergedPdf.copyPages(pdf, pageIndices);
 
-    link.click();
+        // Add pages
+        copiedPages.forEach((page) => {
+          mergedPdf.addPage(page);
+        });
+      }
 
-    setToast({
-  type: "success",
-  message: "PDF Merged Successfully",
-});
+      // Save merged PDF
+      const mergedBytes = await mergedPdf.save();
 
-setTimeout(() => {
-  setToast(null);
-}, 3000);
+      // Create downloadable file
+      const blob = new Blob([mergedBytes], {
+        type: "application/pdf",
+      });
 
-    document.body.removeChild(link);
+      const url = URL.createObjectURL(blob);
 
-    URL.revokeObjectURL(url);
-  } catch (error) {
-    console.error(error);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "merged.pdf";
 
-setToast({
-  type: "error",
-  message: "Failed To Merge PDFs",
-});
+      document.body.appendChild(link);
+      link.click();
 
-setTimeout(() => {
-  setToast(null);
-}, 3000);
-  } finally {
-    setLoading(false);
-  }
-};
+      setToast({
+        type: "success",
+        message: "PDF Merged Successfully",
+      });
+
+      setTimeout(() => {
+        setToast(null);
+      }, 3000);
+
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+
+      setToast({
+        type: "error",
+        message: "Failed To Merge PDFs",
+      });
+
+      setTimeout(() => {
+        setToast(null);
+      }, 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
