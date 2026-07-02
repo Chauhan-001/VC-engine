@@ -9,6 +9,7 @@ import UploadZone from "../../components/common/UploadZone";
 
 import CompressionLevelCard from "../../components/pdf/CompressionLevelCard";
 import OutputEstimateCard from "../../components/pdf/OutputEstimateCard";
+import CompressButton from "../../components/pdf/CompressButton";
 
 async function getPdfLib() {
   const mod = await import("pdf-lib");
@@ -126,8 +127,8 @@ function CompressPdf() {
     // Note: Without specialized image/XObject re-encoding, the size reduction is
     // best-effort and depends on the source PDF structure. We still implement a true
     // client-side PDF rebuild.
-    const PDFDocument = await getPDFDocument();
-    const srcPdf = await PDFDocument.load(pdfBytes);
+const { PDFDocument } = await getPdfLib();
+const srcPdf = await PDFDocument.load(pdfBytes);
 
     // Clone pages into a new doc (forces structural rebuild).
     const outPdf = await PDFDocument.create();
