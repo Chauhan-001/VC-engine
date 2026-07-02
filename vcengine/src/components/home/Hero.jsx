@@ -1,6 +1,7 @@
 import { useState } from "react";
 import BrowserPreview from "./BrowserPreview";
 import shieldIcon from "../../assets/shield.png";
+import { Link } from "react-router-dom";
 
 function Hero() {
 const [mousePos, setMousePos] = useState({
@@ -224,28 +225,28 @@ const [mousePos, setMousePos] = useState({
             Explore Tools
           </a>
 
-          <a
-            href="/documentation"
-            className="
-              border-[3px]
-              border-black
-              bg-white
-              px-8
-              py-4
-              font-mono
-              font-bold
-              uppercase
-              text-black
-              shadow-[4px_4px_0px_0px_black]
-              transition-all
-              duration-200
-              hover:-translate-x-1
-              hover:-translate-y-1
-              hover:shadow-[8px_8px_0px_0px_black]
-            "
-          >
-            How It Works
-          </a>
+<Link
+  to="/documentation"
+  className="
+    border-[3px]
+    border-black
+    bg-white
+    px-8
+    py-4
+    font-mono
+    font-bold
+    uppercase
+    text-black
+    shadow-[4px_4px_0px_0px_black]
+    transition-all
+    duration-200
+    hover:-translate-x-1
+    hover:-translate-y-1
+    hover:shadow-[8px_8px_0px_0px_black]
+  "
+>
+  How It Works
+</Link>
         </div>
 
         {/* Browser Preview */}
