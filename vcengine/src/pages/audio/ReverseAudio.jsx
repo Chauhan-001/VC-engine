@@ -118,9 +118,9 @@ export default function ReverseAudio() {
       <Navbar />
       <main className="pt-28">
         <div className="mx-auto max-w-[1400px] px-6 pb-24">
-          <Link to="/audio" className="mb-10 inline-flex items-center gap-2 font-mono text-sm uppercase text-gray-400 transition-colors hover:text-[#ff3b30]">
+          <Link to="/" className="mb-10 inline-flex items-center gap-2 font-mono text-sm uppercase text-gray-400 transition-colors hover:text-[#ff3b30]">
             <ArrowLeft size={18} />
-            Back To Audio Studio
+            Back To Home
           </Link>
 
           <div className="mb-12">
