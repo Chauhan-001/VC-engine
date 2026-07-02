@@ -125,46 +125,64 @@ const [mousePos, setMousePos] = useState({
           <span>Secure Client-Side Processing</span>
         </div>
 
-        {/* Main Heading */}
-        <h1
-          className="
-            max-w-5xl
-            text-5xl
-            font-black
-            uppercase
-            leading-tight
-            text-white
-            md:text-7xl
-          "
-        >
-          ALL YOUR DIGITAL TOOLS
-        </h1>
+    {/* Mobile Heading */}
+<h1
+  className="
+    block
+    md:hidden
+    text-4xl
+    font-black
+    uppercase
+    leading-tight
+    text-white
+  "
+>
+  DIGITAL TOOLS
+</h1>
 
-        {/* Highlighted Text */}
-        <div
-          className="
-            mt-4
-            border-[3px]
-            border-black
-            bg-white
-            px-6
-            py-3
-            shadow-[8px_8px_0px_0px_black]
-          "
-        >
-          <span
-            className="
-              text-3xl
-              font-black
-              uppercase
-              text-[#0066ff]
-              md:text-5xl
-            "
-          >
-            DIRECTLY IN THE BROWSER.
-          </span>
-        </div>
+{/* Desktop Heading */}
+<h1
+  className="
+    hidden
+    md:block
+    max-w-5xl
+    text-5xl
+    font-black
+    uppercase
+    leading-tight
+    text-white
+    md:text-7xl
+  "
+>
+  ALL YOUR DIGITAL TOOLS
+</h1>
 
+{/* Desktop Highlighted Text */}
+<div
+  className="
+    hidden
+    md:block
+    mt-4
+    border-[3px]
+    border-black
+    bg-white
+    px-6
+    py-3
+    shadow-[8px_8px_0px_0px_black]
+  "
+>
+  <span
+    className="
+      text-3xl
+      font-black
+      uppercase
+      text-[#0066ff]
+      md:text-5xl
+    "
+  >
+    DIRECTLY IN THE BROWSER.
+  </span>
+</div>
         {/* Subtitle */}
         <div
           className="
