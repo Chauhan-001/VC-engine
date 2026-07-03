@@ -130,15 +130,20 @@ const [mousePos, setMousePos] = useState({
   className="
     block
     md:hidden
+    font-orbitron
     text-5xl
     font-black
-    tracking-tight
     uppercase
-    leading-tight
+    tracking-tight
+    leading-[0.9]
     text-white
+    drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]
+    select-none
   "
 >
-  DIGITAL TOOLS
+  DIGITAL
+  <br />
+  TOOLS
 </h1>
 
 {/* Desktop Heading */}
