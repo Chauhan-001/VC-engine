@@ -130,15 +130,17 @@ const [mousePos, setMousePos] = useState({
   className="
     block
     md:hidden
-    font-orbitron
     text-5xl
+    sm:text-6xl
     font-black
     uppercase
-    tracking-tight
-    leading-[0.9]
+    tracking-[-0.08em]
+    leading-[0.85]
     text-white
-    drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]
+    antialiased
     select-none
+    drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]
+    [text-shadow:0_2px_0_rgba(255,255,255,0.15),0_0_18px_rgba(255,255,255,0.08)]
   "
 >
   DIGITAL
