@@ -131,16 +131,14 @@ const [mousePos, setMousePos] = useState({
     block
     md:hidden
     text-5xl
-    sm:text-6xl
-    font-black
+    font-extrabold
     uppercase
-    tracking-[-0.08em]
-    leading-[0.85]
+    tracking-[-0.1em]
+    leading-[0.82]
     text-white
-    antialiased
-    select-none
-    drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]
-    [text-shadow:0_2px_0_rgba(255,255,255,0.15),0_0_18px_rgba(255,255,255,0.08)]
+    transform
+    skew-x-[-6deg]
+    [text-shadow:2px_0_0_#00F5FF,-2px_0_0_#FF007A]
   "
 >
   DIGITAL
