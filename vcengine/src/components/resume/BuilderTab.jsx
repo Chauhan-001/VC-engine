@@ -17,8 +17,8 @@ import {
   Maximize2,
   Zap,
 } from "lucide-react";
-import Github from "../../assets/github.png";
-import Linkedin from "../../assets/linkedin.png";
+import Github from "../../assets/github.webp";
+import Linkedin from "../../assets/linkedin.webp";
 
 // ─── helpers ───────────────────────────────────────────────────────────────
 

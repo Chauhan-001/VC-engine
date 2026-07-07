@@ -130,7 +130,7 @@ export default function AudioTrimmer() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <Navbar />
-      <main className="pt-28">
+      <main id="main-content" tabIndex={-1} className="pt-28">
         <div className="mx-auto max-w-[1400px] px-6 pb-24">
           <Link to="/" className="mb-10 inline-flex items-center gap-2 font-mono text-sm uppercase text-gray-400 transition-colors hover:text-[#ff3b30]">
             <ArrowLeft size={18} />

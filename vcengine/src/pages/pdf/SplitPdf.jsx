@@ -201,7 +201,7 @@ function SplitPdf() {
       {toast && <Toast type={toast.type} message={toast.message} />}
       <Navbar />
 
-      <main className="relative overflow-hidden pt-28">
+      <main id="main-content" tabIndex={-1} className="relative overflow-hidden pt-28">
         {/* Animated Dotted Background (same style as MergePdf) */}
         <div
           className="absolute inset-0 opacity-70 pointer-events-none animate-[moveGrid_12s_linear_infinite]"

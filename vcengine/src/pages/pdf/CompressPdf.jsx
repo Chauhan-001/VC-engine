@@ -209,7 +209,7 @@ const srcPdf = await PDFDocument.load(pdfBytes);
       {toast && <Toast type={toast.type} message={toast.message} />}
       <Navbar />
 
-      <main className="relative overflow-hidden pt-28">
+      <main id="main-content" tabIndex={-1} className="relative overflow-hidden pt-28">
         <div
           className="absolute inset-0 opacity-70 pointer-events-none animate-[moveGrid_12s_linear_infinite]"
           style={{

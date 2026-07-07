@@ -130,7 +130,7 @@ export default function AudioSplitter() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <Navbar />
-      <main className="pt-28">
+      <main id="main-content" tabIndex={-1} className="pt-28">
         <div className="mx-auto max-w-[1400px] px-6 pb-24">
           <Link
             to="/"

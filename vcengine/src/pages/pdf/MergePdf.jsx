@@ -125,7 +125,7 @@ function MergePdf() {
       <Navbar />
 
       {/* Main Content */}
-      <main className="relative overflow-hidden pt-28">
+      <main id="main-content" tabIndex={-1} className="relative overflow-hidden pt-28">
         {/* Animated Dotted Background */}
         <div
           className="

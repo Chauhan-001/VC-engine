@@ -190,7 +190,7 @@ function ExtractPages() {
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <Navbar />
 
-      <main className="relative overflow-hidden pt-28">
+      <main id="main-content" tabIndex={-1} className="relative overflow-hidden pt-28">
         {/* Animated Dotted Background */}
         <div
           className="

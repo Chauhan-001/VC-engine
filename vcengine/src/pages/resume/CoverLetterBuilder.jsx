@@ -21,7 +21,7 @@ export default function CoverLetterBuilderPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <Navbar />
-      <main className="pt-28">
+      <main id="main-content" tabIndex={-1} className="pt-28">
         <div className="mx-auto max-w-[1800px] px-6 pb-24">
           <div className="mb-8">
             <h1 className="text-6xl font-black uppercase">Cover Letter Builder</h1>

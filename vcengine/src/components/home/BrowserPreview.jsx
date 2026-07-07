@@ -1,6 +1,6 @@
-import powerfulImg from "../../assets/powerful.png";
-import privateImg from "../../assets/private.png";
-import lightningImg from "../../assets/lightning-fast.png";
+import powerfulImg from "../../assets/powerful.webp";
+import privateImg from "../../assets/private.webp";
+import lightningImg from "../../assets/lightning-fast.webp";
 
 function BrowserPreview() {
   return (
@@ -64,7 +64,11 @@ function BrowserPreview() {
         >
           <img
             src={powerfulImg}
-            alt="Powerful"
+            alt="VCEngine running heavy media processing tasks powerfully in the browser"
+            width={400}
+            height={300}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         </div>
@@ -85,7 +89,11 @@ function BrowserPreview() {
         >
           <img
             src={privateImg}
-            alt="Private"
+            alt="Your files stay private and never leave your device"
+            width={400}
+            height={300}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         </div>
@@ -106,7 +114,11 @@ function BrowserPreview() {
         >
           <img
             src={lightningImg}
-            alt="Lightning Fast"
+            alt="VCEngine delivers lightning-fast, instant results"
+            width={400}
+            height={300}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         </div>

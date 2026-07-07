@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo.webp";
 
 function Footer() {
   return (
@@ -10,7 +10,11 @@ function Footer() {
         <div className="flex flex-col gap-6">
           <img
             src={logo}
-            alt="VCENGINE"
+            alt="VCEngine"
+            width={144}
+            height={48}
+            loading="lazy"
+            decoding="async"
             className="
               h-12
               w-fit

@@ -251,7 +251,7 @@ export default function ImageCompressor() {
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <Navbar />
 
-      <main className="pb-24 pt-28">
+      <main id="main-content" tabIndex={-1} className="pb-24 pt-28">
         <div className="mx-auto max-w-[1800px] px-6">
           <div className="mb-10 flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">

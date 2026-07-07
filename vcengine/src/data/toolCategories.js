@@ -1,8 +1,8 @@
-import pdfIcon from "../assets/pdf.png";
-import audioIcon from "../assets/audio.png";
-import imageIcon from "../assets/image.png";
-import videoIcon from "../assets/video.png";
-import resumeIcon from "../assets/resume.png";
+import pdfIcon from "../assets/pdf.webp";
+import audioIcon from "../assets/audio.webp";
+import imageIcon from "../assets/image.webp";
+import videoIcon from "../assets/video.webp";
+import resumeIcon from "../assets/resume.webp";
 
 export const toolCategories = [
   {

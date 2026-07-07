@@ -412,7 +412,7 @@ function VideoCompressor() {
     >
       <Navbar />
 
-      <main className="pt-28">
+      <main id="main-content" tabIndex={-1} className="pt-28">
         <div
           className="
             mx-auto

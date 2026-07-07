@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
@@ -27,7 +27,7 @@ export default function Status() {
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <Navbar />
 
-      <main className="pt-28">
+      <main id="main-content" tabIndex={-1} className="pt-28">
         <div className="mx-auto max-w-[1200px] px-6 pb-24">
           <header className="mb-12">
             <h1 className="text-6xl font-black uppercase">System Status</h1>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import BrowserPreview from "./BrowserPreview";
-import shieldIcon from "../../assets/shield.png";
+import shieldIcon from "../../assets/shield.webp";
 import { Link } from "react-router-dom";
 
 function Hero() {
@@ -90,6 +90,11 @@ const [mousePos, setMousePos] = useState({
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center">
         
+        {/* Single semantic H1 for SEO / screen readers (visually hidden) */}
+        <h1 className="sr-only">
+          All Your Digital Tools — Directly in the Browser
+        </h1>
+
         {/* Top Badge */}
         <div
           className="
@@ -119,49 +124,52 @@ const [mousePos, setMousePos] = useState({
           <img
             src={shieldIcon}
             alt="Secure"
+            width={20}
+            height={20}
+            decoding="async"
             className="h-5 w-5 object-contain"
           />
 
           <span>Secure Client-Side Processing</span>
         </div>
 
-    {/* Mobile Heading */}
-<h1
-  className="
-    block
-    md:hidden
-    text-5xl
-    font-extrabold
-    uppercase
-    tracking-[-0.1em]
-    leading-[0.82]
-    text-white
-    transform
-    skew-x-[-6deg]
-    [text-shadow:2px_0_0_#00F5FF,-2px_0_0_#FF007A]
-  "
->
-  DIGITAL
-  <br />
-  TOOLS
-</h1>
+ {/* Mobile Heading */}
+ <p
+   className="
+     block
+     md:hidden
+     text-5xl
+     font-extrabold
+     uppercase
+     tracking-[-0.1em]
+     leading-[0.82]
+     text-white
+     transform
+     skew-x-[-6deg]
+     [text-shadow:2px_0_0_#00F5FF,-2px_0_0_#FF007A]
+   "
+ >
+   DIGITAL
+   <br />
+   TOOLS
+ </p>
 
-{/* Desktop Heading */}
-<h1
-  className="
-    hidden
-    md:block
-    max-w-5xl
-    text-5xl
-    font-black
-    uppercase
-    leading-tight
-    text-white
-    md:text-7xl
-  "
->
-  ALL YOUR DIGITAL TOOLS
-</h1>
+ {/* Desktop Heading */}
+ <p
+   className="
+     hidden
+     md:block
+     max-w-5xl
+     text-5xl
+     font-black
+     uppercase
+     leading-tight
+     text-white
+     md:text-7xl
+   "
+ >
+   ALL YOUR DIGITAL TOOLS
+ </p>
 
 {/* Desktop Highlighted Text */}
 <div
