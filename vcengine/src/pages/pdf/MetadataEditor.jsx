@@ -225,7 +225,7 @@ function MetadataEditor() {
               uppercase
               text-gray-400
               transition-colors
-              hover:text-[#7c3aed]
+              hover:text-[#0066ff]
             "
           >
             <ArrowLeft size={18} />
