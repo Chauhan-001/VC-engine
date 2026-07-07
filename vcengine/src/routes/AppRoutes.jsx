@@ -45,7 +45,6 @@ const Documentation = lazy(() => import("../pages/Documentation.jsx"));
 const Status = lazy(() => import("../pages/Status.jsx"));
 const PrivacyPolicy = lazy(() => import("../pages/PrivacyPolicy.jsx"));
 const TermsOfService = lazy(() => import("../pages/TermsOfService.jsx"));
-const metadata=lazy(()=> import("../pages/pdf/MetadataEditor.jsx"));
 
 function RouteFallback() {
   return (
@@ -81,7 +80,6 @@ export default function AppRoutes() {
             <Route path="/pdf/protect" element={<ProtectPdf />} />
             <Route path="/pdf/unlock" element={<UnlockPdf />} />
             <Route path="/pdf/metadata" element={<MetadataEditor />} />
-          <Route path="/pdf/metadata" element={<metadata/>}/>
 
             <Route path="/audio/trim" element={<AudioTrimmer />} />
             <Route path="/audio/merger" element={<AudioMerger />} />

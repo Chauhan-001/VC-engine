@@ -2,10 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/assets/logo.webp" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0066ff" />
+
+    <!-- Preload the LCP hero image so it is discovered during HTML parse,
+         independent of the JS bundle / route chunk dependency tree. -->
+    <link
+      rel="preload"
+      as="image"
+      href="/hero-lcp-1200.avif"
+      type="image/avif"
+      fetchpriority="high"
+    />
 
     <!-- Base SEO (route-specific tags are injected by SeoProvider) -->
     <meta name="description" content="VCEngine Media Suite — powerful, secure, client-side tools to compress and convert PDFs, images, audio, and video." />

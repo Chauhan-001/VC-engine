@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo.webp";
+
+const logo = "/logo-288.webp";
 
 function Footer() {
   return (
@@ -11,8 +12,8 @@ function Footer() {
           <img
             src={logo}
             alt="VCEngine"
-            width={144}
-            height={48}
+            width={288}
+            height={161}
             loading="lazy"
             decoding="async"
             className="

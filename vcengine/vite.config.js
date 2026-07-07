@@ -13,10 +13,10 @@ function manualChunks(id) {
   if (!id.includes("node_modules")) return;
 
   if (id.includes("@ffmpeg")) return "vendor-ffmpeg";
-  if (id.includes("pdfjs-dist") || id.includes("pdf-lib") || id.includes("@cantoo"))
-    return "vendor-pdf";
+  if (id.includes("pdfjs-dist")) return "vendor-pdfjs";
+  if (id.includes("@cantoo/pdf-lib")) return "vendor-pdf-cantoo";
+  if (id.includes("pdf-lib") && !id.includes("@cantoo")) return "vendor-pdf-lib";
   if (id.includes("wavesurfer")) return "vendor-wavesurfer";
-  if (id.includes("framer-motion")) return "vendor-motion";
   if (id.includes("@dnd-kit")) return "vendor-dnd";
   if (id.includes("lucide-react")) return "vendor-icons";
   if (

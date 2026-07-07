@@ -1,22 +1,26 @@
-import { useState } from "react";
+import { useRef } from "react";
 import BrowserPreview from "./BrowserPreview";
-import shieldIcon from "../../assets/shield.webp";
 import { Link } from "react-router-dom";
 
+const shieldIcon = "/shield-64.webp";
+
 function Hero() {
-const [mousePos, setMousePos] = useState({
-  x: 0,
-  y: 0,
-});
+  // Track the mouse glow via a ref and update the DOM node directly so that
+  // moving the pointer does NOT trigger a React re-render of the entire Hero
+  // (and its heavy BrowserPreview subtree) on every mousemove.
+  const glowRef = useRef(null);
+
+  const handleMouseMove = (e) => {
+    const g = glowRef.current;
+    if (g) {
+      g.style.left = `${e.clientX - 225}px`;
+      g.style.top = `${e.clientY - 225}px`;
+    }
+  };
 
   return (
     <section
-      onMouseMove={(e) =>
-        setMousePos({
-          x: e.clientX,
-          y: e.clientY,
-        })
-      }
+      onMouseMove={handleMouseMove}
       className="
         relative
         flex
@@ -64,9 +68,10 @@ const [mousePos, setMousePos] = useState({
           duration-300
         "
         style={{
-          left: mousePos.x - 225,
-          top: mousePos.y - 225,
+          left: -2000,
+          top: -2000,
         }}
+        ref={glowRef}
       />
 
       {/* Ambient Center Glow */}

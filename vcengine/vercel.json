@@ -14,6 +14,12 @@
       ]
     },
     {
+      "source": "/(hero-lcp-.*|logo-.*|shield-.*|preview-.*|og-default.png|favicon.svg)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=604800, immutable" }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },

@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo.webp";
+
+const logo = "/logo-288.webp";
 
 const navItems = [
   { title: "Tools", id: "tools" },
@@ -44,8 +45,9 @@ function Navbar() {
           <img
             src={logo}
             alt="VCEngine"
-            width={120}
-            height={40}
+            width={288}
+            height={161}
+            decoding="async"
             className="h-10 w-auto border-[3px] border-black bg-white shadow-[4px_4px_0px_0px_#0066ff] transition-all duration-200 hover:shadow-[6px_6px_0px_0px_#0066ff]"
           />
         </Link>

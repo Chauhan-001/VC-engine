@@ -1,6 +1,21 @@
-import powerfulImg from "../../assets/powerful.webp";
-import privateImg from "../../assets/private.webp";
-import lightningImg from "../../assets/lightning-fast.webp";
+import { memo } from "react";
+
+const LCP_WIDTH = 1200;
+const LCP_HEIGHT = 800;
+
+const heroSrcSetAvif = [
+  "/hero-lcp-400.avif 400w",
+  "/hero-lcp-800.avif 800w",
+  "/hero-lcp-1200.avif 1200w",
+].join(", ");
+
+const heroSrcSetWebp = [
+  "/hero-lcp-400.webp 400w",
+  "/hero-lcp-800.webp 800w",
+  "/hero-lcp-1200.webp 1200w",
+].join(", ");
+
+const sizes = "(max-width: 768px) 90vw, 400px";
 
 function BrowserPreview() {
   return (
@@ -47,8 +62,7 @@ function BrowserPreview() {
 
       {/* Browser Content */}
       <div className="grid gap-8 bg-[#111] p-8 md:grid-cols-3">
-
-        {/* POWERFUL */}
+        {/* POWERFUL — LCP image: eager, high priority, responsive AVIF/WebP */}
         <div
           className="
             overflow-hidden
@@ -62,15 +76,24 @@ function BrowserPreview() {
             hover:shadow-[10px_10px_0px_0px_#0066ff]
           "
         >
-          <img
-            src={powerfulImg}
-            alt="VCEngine running heavy media processing tasks powerfully in the browser"
-            width={400}
-            height={300}
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover"
-          />
+          <picture>
+            <source
+              type="image/avif"
+              srcSet={heroSrcSetAvif}
+              sizes={sizes}
+            />
+            <img
+              src="/hero-lcp-800.webp"
+              srcSet={heroSrcSetWebp}
+              sizes={sizes}
+              alt="VCEngine running heavy media processing tasks powerfully in the browser"
+              width={LCP_WIDTH}
+              height={LCP_HEIGHT}
+              decoding="async"
+              fetchPriority="high"
+              className="h-full w-full object-cover"
+            />
+          </picture>
         </div>
 
         {/* PRIVATE */}
@@ -88,10 +111,10 @@ function BrowserPreview() {
           "
         >
           <img
-            src={privateImg}
+            src="/preview-private-800.webp"
             alt="Your files stay private and never leave your device"
-            width={400}
-            height={300}
+            width={800}
+            height={533}
             loading="lazy"
             decoding="async"
             className="h-full w-full object-cover"
@@ -113,19 +136,18 @@ function BrowserPreview() {
           "
         >
           <img
-            src={lightningImg}
+            src="/preview-lightning-800.webp"
             alt="VCEngine delivers lightning-fast, instant results"
-            width={400}
-            height={300}
+            width={800}
+            height={533}
             loading="lazy"
             decoding="async"
             className="h-full w-full object-cover"
           />
         </div>
-
       </div>
     </div>
   );
 }
 
-export default BrowserPreview;
+export default memo(BrowserPreview);
